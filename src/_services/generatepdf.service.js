@@ -192,6 +192,7 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
      */
         // TODO : const generateBordereauVersement = (archivesArray, fromArchiviste = false, type: string = 'versement-pal' ) => {
     const generateBordereauVersement = (archivesArray, fromArchiviste = false, type: string = 'elimination' ) => {
+            console.log(archivesArray);
         /*// Routage selon si on vient d'un JSON ou du .NET
 
         const dossiers = !fromArchiviste ? archivesArray[0].Dossiers : archivesArray[0].dossiers;

@@ -29,7 +29,10 @@ const DashboardUser = (props) => {
 
         fetch(API_URL + "archives/hra/" + userHRA)
             .then(result => result.json())
-            .then(rd => setRowData(rd))
+            .then((rd) => {
+                setRowData(rd);
+                GeneratePdfService.generateQrList(rd, "QrHiddenHolder", true);
+            })
             .catch(() => {
                 setErrOccured(true);
                 setLoadingMessage("Impossible de se connecter au serveur");
@@ -37,6 +40,7 @@ const DashboardUser = (props) => {
         setTimeout(() => {
             params.api.showLoadingOverlay();
         }, 0);
+
     };
 
     const gridOption = {
@@ -65,7 +69,7 @@ const DashboardUser = (props) => {
                 </IconButton>
             </Tooltip>
             <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Imprimer le bordereau</p>}>
-                <IconButton size={"small"} onClick={() => handleOpen(params)} >
+                <IconButton size={"small"} onClick={() => handleBordereau(params)} >
                     <FiFileText size={"1.4em"} />
                 </IconButton>
             </Tooltip>
@@ -122,8 +126,44 @@ const DashboardUser = (props) => {
         });
     }
 
+    const getAllRows = (params) => {
+        let {rowsToDisplay} = params.api.getModel();
+
+        return rowsToDisplay;
+    }
+
     const handleEtiquette = (params) => {
-        GeneratePdfService.generateEtiquettes(params.node.data);
+        let archivesLabel = [];
+        const fileName = 'Etiquettes';
+        let rowsToDisplay = getAllRows(params);
+        let linkedArchives = [];
+
+        rowsToDisplay.forEach(row => {
+            console.log(row.data.group, params.data.group);
+            if(params.data.group === row.data.group) {
+                linkedArchives.push(row.data);
+            }
+        })
+        archivesLabel = linkedArchives;
+        const doc = GeneratePdfService.generateEtiquettes(archivesLabel, true);
+        GeneratePdfService.downloadOnClick(doc, "pdfLabelHolder", fileName);
+    }
+
+    const handleBordereau = (params) => {
+        let archivesBordereau = [];
+        let fileName = `Bordereau`;
+        archivesBordereau.push(params.data);
+        let rowsToDisplay = getAllRows(params);
+        let linkedArchives = [];
+
+        rowsToDisplay.forEach(row => {
+            if(params.data.group === row.data.group) {
+                linkedArchives.push(row.data);
+            }
+        });
+        archivesBordereau = linkedArchives;
+        const doc = GeneratePdfService.generateBordereauVersement(archivesBordereau);
+        GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
     }
 
     const useStyles = makeStyles(theme => {
@@ -187,6 +227,10 @@ const DashboardUser = (props) => {
                         <AgGridColumn field="actions" />
                     </AgGridReact>
                 </div>
+                <div id={"QrHiddenHolder"} hidden={true} />
+                <div id={"pdfLabelHolder"} hidden={true} />
+                <div id={"pdfBordereauHolder"} hidden={true} />
+
             </div>
             <Modal
                 open={open}

@@ -1,0 +1,33 @@
+.ag-checkbox-input {
+    margin-right: 4em !important;
+    width: 1em !important;
+}
+
+.list-item {
+    text-align: center;
+    word-wrap: break-word;
+}
+
+#list-subheader {
+    text-align: center;
+}
+
+/*Align some Grid in the middle*/
+.archiviste-table > .ag-cell {
+    display: flex;
+    padding-left: 5px;
+    align-items: center;
+}
+
+.MuiPopover-paper {
+    min-height: 36px !important;
+    min-width: 360px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 5px !important;
+}
+
+/*Pour éviter un bug lors du ReactDOM.render() il faut forcer la couleur de cette classe.*/
+/*.MuiButton-root {
+    color: white !important;
+}*/

@@ -214,6 +214,7 @@ const AddArchive = (props) => {
         const gridData = apiRef.current.getRowModels();
         gridData.forEach((data) => {
             const userIntel = JSON.parse(localStorage.getItem('user'));
+            console.log(userIntel);
             const archive = {
                 N: null,
                 Nom: userIntel["nom"],
@@ -233,7 +234,17 @@ const AddArchive = (props) => {
                 Localisation: null,
                 Status: "Archivage demandé",
                 StatusCode: 1,
-                Logs: []
+                Logs: [],
+                Consultation: {
+                    NomDemandeur: userIntel['nom'],
+                    PrenomDemandeur: userIntel['prenom'],
+                    MailDemandeur: userIntel['adresseMail'],
+                    MatriculeDemandeur: userIntel['matricule'],
+                    TelephoneDemandeur: null,
+                    EtablissementDemandeur: userIntel['site'],
+                    DirectionDemandeur: userIntel['direction'],
+                    ServiceDemandeur: userIntel['service'],
+                }
             };
             archive.Logs.push({
                 mouvement: "IN",
@@ -243,6 +254,7 @@ const AddArchive = (props) => {
                 date: new Date(Date.now()),
                 slug_date: Date.now()
             });
+            console.log(archive);
             ArchiveService.postArchive(archive)
                 .then(archivesArray.push(archive));
             setQrGenerated(true);
@@ -254,7 +266,6 @@ const AddArchive = (props) => {
         GeneratePdfService.downloadOnClick(doc, "etiquetteBtnHolder", "etiquette(s)", false);
         doc = GeneratePdfService.generateBordereauVersement(archivesArray)
         GeneratePdfService.downloadOnClick(doc, "bordereauBtnHolder", "bordereau", false);
-
         /*onQRGenerate(archivesArray);*/
         // archivesArray = [];
 
@@ -289,7 +300,6 @@ const AddArchive = (props) => {
             document.getElementById('etiquetteBtnHolder').firstChild.remove();
             document.getElementById('bordereauBtnHolder').firstChild.remove();
         }*/
-
     };
 
     const onKeyUp = (event) => {

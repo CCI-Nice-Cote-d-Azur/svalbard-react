@@ -235,7 +235,7 @@ const App = () => {
                 <Switch>
                     <Route exact path={"/archive"}>
                         {isAuthenticated ? (
-                            <Archives drawerWidth={drawerWidth} darkModeEnabled={prefersDarkMode} />
+                            <Archives drawerWidth={drawerWidth} isArchiviste={isArchiviste} darkModeEnabled={prefersDarkMode} />
                         ) : (
                             <Login stateChanger={setIsAuthenticated} drawerWidth={drawerWidth} />
                         )}

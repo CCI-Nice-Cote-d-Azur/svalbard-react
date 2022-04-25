@@ -32,23 +32,23 @@ const styles = StyleSheet.create({
     w45: {width: '45%'}, w50: {width: '50%'},
 });
 
-    const generateEtiquettes = (archivesArray, fromArchiviste = false) => {
+    const generateEtiquettes = (archivesArray, fromFront = false) => {
         let renderPage = [];
         let pageNumber = 0;
         let renderItems = [];
         // eslint-disable-next-line array-callback-return
         archivesArray.map((value, index) => {
-            let cote = fromArchiviste ? value['cote'] : value.Cote;
-            // let matriculeVerseur = fromArchiviste ? value['matriculeVerseur'] : value.MatriculeVerseur;
-            let direction = fromArchiviste ? value['direction'] : value.Direction;
-            let service = fromArchiviste ? value['service'] : value.Service;
-            let versement = fromArchiviste ? value['versement'] : value.Versement;
-            let dossiers = fromArchiviste ? value['dossiers'] : value.Dossiers;
-            let elimination = fromArchiviste ? value['elimination'] : value.Elimination;
-            const nom = fromArchiviste
+            let cote = fromFront ? value['cote'] : value.Cote;
+            // let matriculeVerseur = fromFront ? value['matriculeVerseur'] : value.MatriculeVerseur;
+            let direction = fromFront ? value['direction'] : value.Direction;
+            let service = fromFront ? value['service'] : value.Service;
+            let versement = fromFront ? value['versement'] : value.Versement;
+            let dossiers = fromFront ? value['dossiers'] : value.Dossiers;
+            let elimination = fromFront ? value['elimination'] : value.Elimination;
+            const nom = fromFront
                 ? archivesArray[0].nom === undefined || archivesArray[0].nom === null ? '' : archivesArray[0].nom.toUpperCase()
                 : archivesArray[0].Nom === undefined || archivesArray[0].Nom === null ? '' : archivesArray[0].Nom.toUpperCase();
-            const prenom = fromArchiviste
+            const prenom = fromFront
                 ? archivesArray[0].prenom !== undefined || archivesArray[0].prenom !== null ? '' : archivesArray[0].prenom
                 : archivesArray[0].Prenom !== undefined || archivesArray[0].Prenom !== null ? '' : archivesArray[0].Prenom;
 
@@ -154,12 +154,12 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
      * Génère une liste de QR Codes, requiert un tableau d'archives et un identifiant de div pour y coller la liste.
      * @param archivesArray - Tableau d'archives
      * @param id - Identifiant de la div qui va recevoir les QR codes
-     * @param fromArchiviste - Permet de savoir si on vient de l'interface Archiviste
+     * @param fromFront - Permet de savoir si on vient de l'interface Archiviste
      */
-    const generateQrList = (archivesArray, id, fromArchiviste = false) => {
+    const generateQrList = (archivesArray, id, fromFront = false) => {
         ReactDOM.render(
             archivesArray.map((value, index) => {
-                const cote = fromArchiviste ? value['cote'] : value.Cote;
+                const cote = fromFront ? value['cote'] : value.Cote;
                 return (
                     <div key={index}
                          style={{
@@ -186,35 +186,46 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
     /**
      * Génère un bordereau de versement
      * @param archivesArray
-     * @param fromArchiviste
-     * @param type (versement-pal, versement-ad, elimination)
+     * @param fromFront
+     * @param type (versement-pal, versement-ad, elimination, consultation)
      * @returns {[]}
      */
-        // TODO : const generateBordereauVersement = (archivesArray, fromArchiviste = false, type: string = 'versement-pal' ) => {
-    const generateBordereauVersement = (archivesArray, fromArchiviste = false, type: string = 'elimination' ) => {
-            console.log(archivesArray);
+        // TODO : const generateBordereauVersement = (archivesArray, fromFront = false, type: string = 'versement-pal' ) => {
+    const generateBordereauVersement = (archivesArray, fromFront = false, type: string) => {
         /*// Routage selon si on vient d'un JSON ou du .NET
 
-        const dossiers = !fromArchiviste ? archivesArray[0].Dossiers : archivesArray[0].dossiers;
-        const extremes = !fromArchiviste ? archivesArray[0].Extremes : archivesArray[0].extremes;
-        const elimination = !fromArchiviste ? archivesArray[0].Elimination : archivesArray[0].elimination;*/
+        const dossiers = !fromFront ? archivesArray[0].Dossiers : archivesArray[0].dossiers;
+        const extremes = !fromFront ? archivesArray[0].Extremes : archivesArray[0].extremes;
+        const elimination = !fromFront ? archivesArray[0].Elimination : archivesArray[0].elimination;*/
 
-        // const compteVerseur = !fromArchiviste ? archivesArray[0].CompteVerseur : archivesArray[0].compteVerseur;
-        // const cote = !fromArchiviste ? archivesArray[0].Cote : archivesArray[0].cote;
-        const direction = !fromArchiviste ? archivesArray[0].Direction : archivesArray[0].direction;
-        const etablissement = !fromArchiviste ? archivesArray[0].Etablissement : archivesArray[0].etablissement;
-        const service = !fromArchiviste ? archivesArray[0].Service : archivesArray[0].service;
-        const versement = !fromArchiviste ? archivesArray[0].Versement : archivesArray[0].versement;
-        const nom = !fromArchiviste
+        // const compteVerseur = !fromFront ? archivesArray[0].CompteVerseur : archivesArray[0].compteVerseur;
+        // const cote = !fromFront ? archivesArray[0].Cote : archivesArray[0].cote;
+
+        // fromFront = true;z
+        console.log(archivesArray[0], fromFront);
+        const direction = !fromFront ? archivesArray[0].Direction : archivesArray[0].direction;
+        const etablissement = !fromFront ? archivesArray[0].Etablissement : archivesArray[0].etablissement;
+        const service = !fromFront ? archivesArray[0].Service : archivesArray[0].service;
+        const versement = !fromFront ? archivesArray[0].Versement : archivesArray[0].versement;
+        const nom = !fromFront
             ? archivesArray[0].Nom === undefined || archivesArray[0].Nom === null ? '' : archivesArray[0].Nom.toUpperCase()
             : archivesArray[0].nom === undefined || archivesArray[0].nom === null ? '' : archivesArray[0].nom.toUpperCase();
-        const prenom = !fromArchiviste
+        const prenom = !fromFront
             ? archivesArray[0].Prenom === undefined || archivesArray[0].Prenom === null ? '' : archivesArray[0].Prenom
             : archivesArray[0].prenom === undefined || archivesArray[0].prenom === null ? '' : archivesArray[0].prenom;
-        // const mail = !fromArchiviste ? archivesArray[0].Mail : archivesArray[0].mail;
-        // const phone = !fromArchiviste ? archivesArray[0].Phone : archivesArray[0].mail;
+        const nomDemandeur = !fromFront
+            ? archivesArray[0].Consultation.NomDemandeur === undefined || archivesArray[0].Consultation.NomDemandeur === null ? '' : archivesArray[0].Consultation.NomDemandeur.toUpperCase()
+            : archivesArray[0].consultation.nomDemandeur === undefined || archivesArray[0].consultation.nomDemandeur === null ? '' : archivesArray[0].consultation.nomDemandeur.toUpperCase();
+        const prenomDemandeur = !fromFront
+            ? archivesArray[0].Consultation.PrenomDemandeur === undefined || archivesArray[0].Consultation.PrenomDemandeur === null ? '' : archivesArray[0].Consultation.PrenomDemandeur
+            : archivesArray[0].consultation.prenomDemandeur === undefined || archivesArray[0].consultation.prenomDemandeur === null ? '' : archivesArray[0].consultation.prenomDemandeur;
+        const mailDemandeur = !fromFront ? archivesArray[0].Consultation.MailDemandeur : archivesArray[0].consultation.mailDemandeur;
+        const phoneDemandeur = !fromFront ? archivesArray[0].Consultation.PhoneDemandeur : archivesArray[0].consultation.phoneDemandeur;
+        // const mail = !fromFront ? archivesArray[0].Mail : archivesArray[0].mail;
+        // const phone = !fromFront ? archivesArray[0].Phone : archivesArray[0].mail;
+        const consultation = !fromFront ? archivesArray[0].Consultation : archivesArray[0].consultation;
 
-        let title, ref, nota1, nota2, nota3, info1, info2, info3, cadre_droit_1, liste_archive;
+        let title, ref, nota1, nota2, nota3, info1, info2, info3, cadre_droit_1, liste_archive, ADS;
         let nom_utilisateur_confie = "{ PAS DE NOM RENSEIGNE }"
         let table_right_1_col1 = 'Cote du versement';
         let table_right_1_col2 = 'Date de la prise en charge';
@@ -306,18 +317,32 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                 )
                 break;
             case 'consultation' :
-                nom_utilisateur_confie = nom + ' ' + prenom;
+                nom_utilisateur_confie = nomDemandeur + ' ' + prenomDemandeur;
                 title = "Bordereau de consultation d'archives publiques";
                 ref = "Date de la demande : " + MiscService.getDateNow();
                 info1 = "Les documents indiqués ci-dessous ont été confiés à " + nom_utilisateur_confie + " et en est responsable à compter de ce jour."
 
-                // TODO : Ajouter les infos récupérées du demandeur ici
+                ADS = (
+                    <View style={styles.w45}>
+                        <Table data={[
+                            { col1: 'Administration', col2: consultation.etablissementDemandeur },
+                            { col1: 'Direction', col2: consultation.directionDemandeur },
+                            { col1: 'Service', col2: consultation.serviceDemandeur }
+                        ]}>
+                            <TableHeader />
+                            <TableBody>
+                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                            </TableBody>
+                        </Table>
+                    </View>
+                );
                 cadre_droit_1 = (
                     <View style={{width: '50%'}}>
                         <Table style={{width: '50%'}} data={[
-                            {col1: "Nom prénom du demandeur", col2: nom + ' ' + prenom},
-                            {col1: "Mail", col2: ''},
-                            {col1: "Téléphone", col2: ''},
+                            {col1: "Nom prénom du demandeur", col2: nomDemandeur + ' ' + prenomDemandeur},
+                            {col1: "Mail", col2: mailDemandeur},
+                            {col1: "Téléphone", col2: phoneDemandeur},
                         ]}>
                             <TableHeader />
                             <TableBody>
@@ -375,18 +400,19 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                     <View style={styles.mainBlock}>
                         {/* Bloc Titre */}
                         <View style={styles.titleBlock}>
-                            <Text style={[styles.title, styles.font_14, styles.mt_20]}>{title.toUpperCase()}</Text>
+                            <Text style={[styles.title, styles.font_14, styles.mt_20]}>{title && title.toUpperCase()}</Text>
                             <Text style={[styles.title, styles.font_12, styles.mt_20]}>{subtitle}</Text>
                             <Text style={[styles.ref, styles.font_10, styles.mt_20]}>{ref}</Text>
                         </View>
                         {/* -- Bloc Titre FIN-- */}
                         <View style={styles.mt_20}>
                             <View style={styles.columnArchive}>
+                                { type !== "consultation" ?
                                 <View style={styles.w45}>
                                     <Table data={[
                                         {col1: 'Administration', col2: etablissement},
-                                        {col1: 'Direction', col2: service},
-                                        {col1: 'Service', col2: direction}
+                                        {col1: 'Direction', col2: direction},
+                                        {col1: 'Service', col2: service}
                                     ]}>
                                         <TableHeader />
                                         <TableBody>
@@ -395,6 +421,8 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                                         </TableBody>
                                     </Table>
                                 </View>
+                                    : ADS
+                                }
                                 { type === "versement-ad" ?
                                     <View style={{backgroundColor: 'lightgray', width: '50%'}}>
                                         <Table data={[

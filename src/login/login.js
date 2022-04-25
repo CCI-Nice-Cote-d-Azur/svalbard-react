@@ -74,7 +74,6 @@ const Login = (props) => {
                         if (props.history.location.pathname === '/login') {
                             props.history.push('/home');
                         } else {
-
                             props.history.push(props.history.location.pathname);
                         }
                         // window.location.reload();

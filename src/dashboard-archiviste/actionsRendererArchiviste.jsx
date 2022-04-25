@@ -67,22 +67,20 @@ const actionRendererArchiviste =  (params) => {
             default :
                 break;
         }
-        if (singleArchive) {
+        if (archive.group) {
+            ArchiveService.putArchiveMany(archive).then(() => params.api.redrawRows());
+        } else if (singleArchive) {
             ArchiveService.putArchive(archive).then(() => params.api.redrawRows());
         } else {
             // TODO : Faire en sorte que la coche s'enlève pour tous les éléments du groupe.
-            ArchiveService.putArchiveMany(archive).then(() => window.location.reload(false));
+            //
         }
-
     }
 
     const getAllRows = () => {
         let {rowsToDisplay} = params.api.getModel();
-
         return rowsToDisplay;
     }
-
-
 
     const generateLabel = (several) => {
         let archivesLabel = [];
@@ -125,23 +123,43 @@ const actionRendererArchiviste =  (params) => {
     }
 
     const renderSwitch = () => {
-        switch(statusCode) {
+        if (statusCode === 1 || statusCode === 2 || statusCode === 3 || statusCode === 4) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage(true)}}>
+                        <FcCheckmark size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            )
+        } else if (statusCode === 11) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider le versement au PAL</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage(true)}}>
+                        <MdInput color={"#43A047"} size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else if (statusCode === 12) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la récupération depuis le PAL</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage(true)}}>
+                        <MdInput color={"#43A047"} size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            )
+        }
+        // FIXME: Le Switch case n'a pas l'air de fonctionner ici.
+        /*switch(statusCode) {
             case 1 || 2 || 3 || 4 :
-                /*getAllRows().forEach(row => {
+
+                /!*getAllRows().forEach(row => {
                     if(row.data.id === archive.id) {
                         console.log(row);
                         //document.getElementById().style.property.display = 'none';
                     }
-                })*/
-                return (
-                    <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
-                        <IconButton size={"small"} onClick={() => {validerArchivage(false)}}>
-                            <FcCheckmark size={"1.4em"} />
-                        </IconButton>
-                    </Tooltip>
-                )
-            case 11 || 12 || 13 || 14:
+                })*!/
 
+            case 11 || 12 || 13 || 14:
                 return (
                     <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider le versement au PAL</p>}>
                         <IconButton size={"small"} onClick={() => {validerArchivage(false)}}>
@@ -151,8 +169,14 @@ const actionRendererArchiviste =  (params) => {
                 )
 
             default:
-                break;
-        }
+                return (
+                    <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
+                        <IconButton size={"small"} onClick={() => {validerArchivage(true)}}>
+                            <FcCheckmark size={"1.4em"} />
+                        </IconButton>
+                    </Tooltip>
+                );
+        }*/
     }
 
     return (

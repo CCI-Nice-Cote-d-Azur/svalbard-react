@@ -48,8 +48,7 @@ const DashboardArchiviste = (props) => {
             if (params.oldValue !== params.newValue) {
                 let archiveLocalisationUpdate = params.data;
                 archiveLocalisationUpdate.localisation = params.newValue;
-                ArchiveService.putArchive(archiveLocalisationUpdate).then(res => {
-                    console.log(res)
+                ArchiveService.putArchive(archiveLocalisationUpdate).then(() => {
                 });
             }
         }

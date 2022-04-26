@@ -24,64 +24,6 @@ import MiscService from "../_services/misc.service";
 
 const randomColor = require('randomcolor');
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
-    },
-    button: {
-        marginTop: theme.spacing(1),
-        marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-        marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-        padding: theme.spacing(3),
-        display: "flex",
-        justifyContent: "space-around"
-    },
-    fab: {
-        marginLeft: theme.spacing(4),
-    },
-    tooltip: {
-        maxWidth: "45vw",
-        minWidth: "45vw",
-        maxHeight: "50vh",
-    },
-    accordionTitle: {
-        fontSize: "1.2rem"
-    },
-    accordion: {
-        marginTop: theme.spacing(3),
-    },
-    box: {
-        marginBottom: theme.spacing(3)
-    },
-    accordionDetails: {
-        display: "flex",
-        flexDirection: "column",
-    },
-    accordionTypoDetails: {
-        marginBottom: theme.spacing(3),
-        textDecoration: "underline"
-    },
-    accordionTypoTips: {
-        marginBottom: theme.spacing(3),
-    },
-    page: {
-        display: "flex",
-        flexDirection: "row",
-        backgroundColor: '#E4E4E4'
-    },
-    section: {
-        margin: 10,
-        padding: 10,
-        flexGrow: 1,
-        width: "33%",
-        backgroundColor: "red"
-    },
-}));
-
 const columns = [
     { field: 'id', headerName: 'ID', width: 90, hide: true },
     {
@@ -214,7 +156,6 @@ const AddArchive = (props) => {
         const gridData = apiRef.current.getRowModels();
         gridData.forEach((data) => {
             const userIntel = JSON.parse(localStorage.getItem('user'));
-            console.log(userIntel);
             const archive = {
                 N: null,
                 Nom: userIntel["nom"],
@@ -254,7 +195,6 @@ const AddArchive = (props) => {
                 date: new Date(Date.now()),
                 slug_date: Date.now()
             });
-            console.log(archive);
             ArchiveService.postArchive(archive)
                 .then(archivesArray.push(archive));
             setQrGenerated(true);
@@ -518,6 +458,64 @@ const AddArchive = (props) => {
         </div>
     );
 }
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+    },
+    button: {
+        marginTop: theme.spacing(1),
+        marginRight: theme.spacing(1),
+    },
+    actionsContainer: {
+        marginBottom: theme.spacing(2),
+    },
+    resetContainer: {
+        padding: theme.spacing(3),
+        display: "flex",
+        justifyContent: "space-around"
+    },
+    fab: {
+        marginLeft: theme.spacing(4),
+    },
+    tooltip: {
+        maxWidth: "45vw",
+        minWidth: "45vw",
+        maxHeight: "50vh",
+    },
+    accordionTitle: {
+        fontSize: "1.2rem"
+    },
+    accordion: {
+        marginTop: theme.spacing(3),
+    },
+    box: {
+        marginBottom: theme.spacing(3)
+    },
+    accordionDetails: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    accordionTypoDetails: {
+        marginBottom: theme.spacing(3),
+        textDecoration: "underline"
+    },
+    accordionTypoTips: {
+        marginBottom: theme.spacing(3),
+    },
+    page: {
+        display: "flex",
+        flexDirection: "row",
+        backgroundColor: '#E4E4E4'
+    },
+    section: {
+        margin: 10,
+        padding: 10,
+        flexGrow: 1,
+        width: "33%",
+        backgroundColor: "red"
+    },
+}));
 
 export default AddArchive;
 

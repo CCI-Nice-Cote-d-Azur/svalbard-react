@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {createStyles, makeStyles} from "@material-ui/core";
+import {Button, createStyles, makeStyles} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
 import ActionRendererArchiviste from './actionsRendererArchiviste.jsx';
@@ -9,23 +9,19 @@ import ArchiveService from '../_services/archive.service';
 const DashboardArchiviste = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
     const [rowData, setRowData] = useState([]);
+    const [paramsApi, setParamsApi] = useState();
     const [errOccured, setErrOccured] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("Pas de données");
 
     let onGridReady = (params) => {
-
+        setParamsApi(params);
         fetch(API_URL + "archives/allButArchived")
             .then(result => result.json())
             .then(rowData => {
                 GeneratePdfService.generateQrList(rowData, "QrHiddenHolder", true);
-                setRowData(rowData)
+                setRowData(rowData);
             })
             .catch(() => {
-                /*console.log(err);
-                if (err === 'TypeError: can\'t access property "map", archivesArray is undefined') {
-                    setErrOccured(true);
-                    setLoadingMessage("Pas de données");
-                }*/
                 setErrOccured(true);
                 setLoadingMessage("Impossible de se connecter au serveur");
             });
@@ -33,6 +29,10 @@ const DashboardArchiviste = (props) => {
             params.api.showLoadingOverlay();
         }, 0);
     };
+
+    let reRender = () => {
+        onGridReady(paramsApi);
+    }
 
     const gridOption = {
         overlayLoadingTemplate : '<span class="ag-overlay-loading-center">' + loadingMessage + '</span>',
@@ -48,8 +48,7 @@ const DashboardArchiviste = (props) => {
             if (params.oldValue !== params.newValue) {
                 let archiveLocalisationUpdate = params.data;
                 archiveLocalisationUpdate.localisation = params.newValue;
-                ArchiveService.putArchive(archiveLocalisationUpdate).then(() => {
-                });
+                ArchiveService.putArchive(archiveLocalisationUpdate).then(() => {});
             }
         }
     }
@@ -60,81 +59,15 @@ const DashboardArchiviste = (props) => {
         resizable: true,
     }
 
-    const columnDefs = [
-        {
-            field: "versement",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            maxWidth: 110
-        },
-        {
-            field: 'cote',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            maxWidth: 100
-        },
-        {
-            field: 'nom',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            minWidth: 100,
-            maxWidth: 140
-        },
-        {
-            field: 'prenom',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            minWidth: 100,
-            maxWidth: 140
-        },
-        {
-            field: "etablissement",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            // maxWidth: 100,
-        },
-        {
-            field: "direction",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-        },
-        {
-            field: "service",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-        },
-        {
-            field: "status",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            cellRenderer: 'statusCodeToText',
-            minWidth: 250
-        },
-        {
-            field: "localisation",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            editable: true,
-            /*minWidth: 300*/
-        },
-        {
-            field: "actions",
-            /*minWidth: 400,*/
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            cellRenderer: 'actionRenderer'
-        }
-    ]
+    const columnDefs =
+        [{field: "versement",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},{field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
+        {field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},{field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
+        {field: "direction",floatingFilterComponentParams: {suppressFilterButton: true,},},
+        {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},},
+        {field: "status",floatingFilterComponentParams: {suppressFilterButton: true,},cellRenderer: 'statusCodeToText',minWidth: 250},
+        {field: "localisation",floatingFilterComponentParams: {suppressFilterButton: true,},editable: true,/*minWidth: 300*/},
+        {field: "actions",/*minWidth: 400,*/floatingFilterComponentParams: {suppressFilterButton: true,}, cellRenderer: 'actionRenderer'}]
 
     const useStyles = makeStyles(theme => {
         createStyles({
@@ -173,6 +106,7 @@ const DashboardArchiviste = (props) => {
                     defaultColDef={defaultColDef}
                     onGridReady={onGridReady}
                     columnDefs={columnDefs}
+                    context={{reRender}}
                 >
                     <AgGridColumn field="versement" />
                     <AgGridColumn field="cote" />

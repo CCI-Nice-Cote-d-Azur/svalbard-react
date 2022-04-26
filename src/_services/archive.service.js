@@ -90,7 +90,6 @@ const token = localStorage.getItem("userToken");
                 }
             })
             .then(res => {
-                console.log(res.data);
                 return res.data;
             })
             .catch(error => {
@@ -135,7 +134,6 @@ const token = localStorage.getItem("userToken");
                 }
             })
             .then(res => {
-                console.log(res.data);
                 return res.data;
             })
             .catch(error => {

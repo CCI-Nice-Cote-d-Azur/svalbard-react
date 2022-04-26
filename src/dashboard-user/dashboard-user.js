@@ -16,8 +16,6 @@ const DashboardUser = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
     const [rowData, setRowData] = useState([]);
     const [params, setParams] = useState([]);
-    // const [api, setApi] = useState([]);
-    // const [gridApi, setGridApi] = useState([]);
     const [errOccured, setErrOccured] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("En cours de chargement");
     const userHRA = localStorage.getItem('userHRA');

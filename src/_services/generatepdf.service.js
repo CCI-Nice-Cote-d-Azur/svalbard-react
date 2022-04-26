@@ -201,8 +201,7 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
         // const compteVerseur = !fromFront ? archivesArray[0].CompteVerseur : archivesArray[0].compteVerseur;
         // const cote = !fromFront ? archivesArray[0].Cote : archivesArray[0].cote;
 
-        // fromFront = true;z
-        console.log(archivesArray[0], fromFront);
+        // fromFront = true;
         const direction = !fromFront ? archivesArray[0].Direction : archivesArray[0].direction;
         const etablissement = !fromFront ? archivesArray[0].Etablissement : archivesArray[0].etablissement;
         const service = !fromFront ? archivesArray[0].Service : archivesArray[0].service;

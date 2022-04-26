@@ -114,7 +114,7 @@ const App = () => {
     const monEspace = [
         isArchiviste ?
         {
-            text: 'Demandes d\'archivage',
+            text: 'Demandes utilisateurs',
             icon: <DashboardIcon />,
             url: '/demandes-archivage'
         }

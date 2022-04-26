@@ -63,6 +63,14 @@ const Archives = (props) => {
                 || params.data.statusCode === 22
                 || params.data.statusCode === 23,
         },
+        onCellValueChanged: (params) => {
+            // On peut tout éditer, je bloque donc l'édition à la localisation uniquement.
+            if (params.oldValue !== params.newValue && params.column.colId === 'localisation') {
+                let archiveLocalisationUpdate = params.data;
+                archiveLocalisationUpdate.localisation = params.newValue;
+                ArchiveService.putArchive(archiveLocalisationUpdate).then(() => {});
+            }
+        }
     }
 
     const rowSelected = (event) => {
@@ -121,41 +129,18 @@ const Archives = (props) => {
         floatingFilterComponentParams: {
             suppressFilterButton: true,
         },
-        sortable: true
+        sortable: true,
+        editable: () => {return props.isArchiviste},
     }
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90, hide: true },
-        {
-            field: 'cote',
-            headerName: 'Cote',
-            width: 100
-        },
-        {
-            field: 'versement',
-            headerName: 'Versement',
-            width: 200,
-        },
-        {
-            field: 'etablissement',
-            headerName: 'Etablissement',
-            width: 100,
-        },
-        {
-            field: 'direction',
-            headerName: 'Direction',
-            width: 200,
-        },
-        {
-            field: 'service',
-            headerName: 'Service',
-            width: 200,
-        },
-        {
-            field: 'dossiers',
-            headerName: 'Dossiers',
-            width: 200,
-        },
+        { field: 'cote', headerName: 'Cote', width: 100},
+        { field: 'versement', headerName: 'Versement', width: 200},
+        { field: 'etablissement', headerName: 'Etablissement', width: 100},
+        { field: 'direction', headerName: 'Direction', width: 200, },
+        { field: 'service', headerName: 'Service', width: 200, },
+        { field: 'dossiers', headerName: 'Dossiers', width: 200, },
     ];
 
     if (props.isArchiviste) {
@@ -257,7 +242,7 @@ const Archives = (props) => {
                             headerCheckboxSelectionFilteredOnly={true}
                             checkboxSelection={true}/>
                         { props.isArchiviste && (
-                            <AgGridColumn field="localisation" />
+                            <AgGridColumn field="localisation"  />
                         )}
                         <AgGridColumn field="versement" />
                         <AgGridColumn field="etablissement" />

@@ -6,31 +6,12 @@ import ArchiveService from '../_services/archive.service';
 import GeneratePdfService from "../_services/generatepdf.service";
 import {LocalOffer, Style} from "@material-ui/icons";
 
-/*import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';*/
+const actionRendererArchiviste =  (props) => {
+    let archive = props.data;
+    let statusCode = props.data.statusCode;
 
-
-const actionRendererArchiviste =  (params) => {
-    let archive = params.data;
-    let statusCode = params.data.statusCode;
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    /*const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popover' : undefined;*/
     //TODO:  singleArchive permet de de définir si on veut valider une ligne ou si on veut valider toutes les lignes en bulk (il faudra ajouter cette fonction plus tard).
-    const validerArchivage = (singleArchive?) => {
+    const validerArchivage = () => {
         switch(archive.statusCode) {
             case 1 :
                 archive.statusCode = 11;
@@ -67,22 +48,42 @@ const actionRendererArchiviste =  (params) => {
             default :
                 break;
         }
-        if (singleArchive) {
-            ArchiveService.putArchive(archive).then(() => params.api.redrawRows());
-        } else {
-            // TODO : Faire en sorte que la coche s'enlève pour tous les éléments du groupe.
-            ArchiveService.putArchiveMany(archive).then(() => window.location.reload(false));
-        }
+        let isGroupGlobalObject = determineIfGroup();
 
+        if (isGroupGlobalObject.isGroup) {
+            ArchiveService.putArchiveMany(archive).then(() => callReRenderFromParent());
+        } else {
+            ArchiveService.putArchive(archive).then(() => props.api.redrawRows());
+        }
+    }
+
+    const callReRenderFromParent = () => {
+        props.context.reRender();
     }
 
     const getAllRows = () => {
-        let {rowsToDisplay} = params.api.getModel();
-
+        let {rowsToDisplay} = props.api.getModel();
         return rowsToDisplay;
     }
 
+    const determineIfGroup = () =>  {
+        let rowsToDisplay = getAllRows();
+        let linkedArchives = [];
+        let linkedArchivesIndexes = [];
 
+        rowsToDisplay.forEach((row, index) => {
+            if(archive.group === row.data.group) {
+                linkedArchives.push(row.data);
+                linkedArchivesIndexes.push(index);
+            }
+        });
+        return {
+            isGroup: linkedArchives.length > 1,
+            groupLength: linkedArchives.length,
+            groupItems: linkedArchives,
+            groupItemsIndexes: linkedArchivesIndexes
+        }
+    }
 
     const generateLabel = (several) => {
         let archivesLabel = [];
@@ -125,23 +126,43 @@ const actionRendererArchiviste =  (params) => {
     }
 
     const renderSwitch = () => {
-        switch(statusCode) {
+        if (statusCode === 1 || statusCode === 2 || statusCode === 3 || statusCode === 4) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage()}}>
+                        <FcCheckmark size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            )
+        } else if (statusCode === 11) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider le versement au PAL</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage()}}>
+                        <MdInput color={"#43A047"} size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            );
+        } else if (statusCode === 12) {
+            return (
+                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la récupération depuis le PAL</p>}>
+                    <IconButton size={"small"} onClick={() => {validerArchivage()}}>
+                        <MdInput color={"#43A047"} size={"1.4em"} />
+                    </IconButton>
+                </Tooltip>
+            )
+        }
+        // FIXME: Le Switch case n'a pas l'air de fonctionner ici.
+        /*switch(statusCode) {
             case 1 || 2 || 3 || 4 :
-                /*getAllRows().forEach(row => {
+
+                /!*getAllRows().forEach(row => {
                     if(row.data.id === archive.id) {
                         console.log(row);
                         //document.getElementById().style.property.display = 'none';
                     }
-                })*/
-                return (
-                    <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
-                        <IconButton size={"small"} onClick={() => {validerArchivage(false)}}>
-                            <FcCheckmark size={"1.4em"} />
-                        </IconButton>
-                    </Tooltip>
-                )
-            case 11 || 12 || 13 || 14:
+                })*!/
 
+            case 11 || 12 || 13 || 14:
                 return (
                     <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider le versement au PAL</p>}>
                         <IconButton size={"small"} onClick={() => {validerArchivage(false)}}>
@@ -151,8 +172,14 @@ const actionRendererArchiviste =  (params) => {
                 )
 
             default:
-                break;
-        }
+                return (
+                    <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
+                        <IconButton size={"small"} onClick={() => {validerArchivage(true)}}>
+                            <FcCheckmark size={"1.4em"} />
+                        </IconButton>
+                    </Tooltip>
+                );
+        }*/
     }
 
     return (

@@ -24,64 +24,6 @@ import MiscService from "../_services/misc.service";
 
 const randomColor = require('randomcolor');
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
-    },
-    button: {
-        marginTop: theme.spacing(1),
-        marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-        marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-        padding: theme.spacing(3),
-        display: "flex",
-        justifyContent: "space-around"
-    },
-    fab: {
-        marginLeft: theme.spacing(4),
-    },
-    tooltip: {
-        maxWidth: "45vw",
-        minWidth: "45vw",
-        maxHeight: "50vh",
-    },
-    accordionTitle: {
-        fontSize: "1.2rem"
-    },
-    accordion: {
-        marginTop: theme.spacing(3),
-    },
-    box: {
-        marginBottom: theme.spacing(3)
-    },
-    accordionDetails: {
-        display: "flex",
-        flexDirection: "column",
-    },
-    accordionTypoDetails: {
-        marginBottom: theme.spacing(3),
-        textDecoration: "underline"
-    },
-    accordionTypoTips: {
-        marginBottom: theme.spacing(3),
-    },
-    page: {
-        display: "flex",
-        flexDirection: "row",
-        backgroundColor: '#E4E4E4'
-    },
-    section: {
-        margin: 10,
-        padding: 10,
-        flexGrow: 1,
-        width: "33%",
-        backgroundColor: "red"
-    },
-}));
-
 const columns = [
     { field: 'id', headerName: 'ID', width: 90, hide: true },
     {
@@ -233,7 +175,17 @@ const AddArchive = (props) => {
                 Localisation: null,
                 Status: "Archivage demandé",
                 StatusCode: 1,
-                Logs: []
+                Logs: [],
+                Consultation: {
+                    NomDemandeur: userIntel['nom'],
+                    PrenomDemandeur: userIntel['prenom'],
+                    MailDemandeur: userIntel['adresseMail'],
+                    MatriculeDemandeur: userIntel['matricule'],
+                    TelephoneDemandeur: null,
+                    EtablissementDemandeur: userIntel['site'],
+                    DirectionDemandeur: userIntel['direction'],
+                    ServiceDemandeur: userIntel['service'],
+                }
             };
             archive.Logs.push({
                 mouvement: "IN",
@@ -254,7 +206,6 @@ const AddArchive = (props) => {
         GeneratePdfService.downloadOnClick(doc, "etiquetteBtnHolder", "etiquette(s)", false);
         doc = GeneratePdfService.generateBordereauVersement(archivesArray)
         GeneratePdfService.downloadOnClick(doc, "bordereauBtnHolder", "bordereau", false);
-
         /*onQRGenerate(archivesArray);*/
         // archivesArray = [];
 
@@ -289,7 +240,6 @@ const AddArchive = (props) => {
             document.getElementById('etiquetteBtnHolder').firstChild.remove();
             document.getElementById('bordereauBtnHolder').firstChild.remove();
         }*/
-
     };
 
     const onKeyUp = (event) => {
@@ -508,6 +458,64 @@ const AddArchive = (props) => {
         </div>
     );
 }
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+    },
+    button: {
+        marginTop: theme.spacing(1),
+        marginRight: theme.spacing(1),
+    },
+    actionsContainer: {
+        marginBottom: theme.spacing(2),
+    },
+    resetContainer: {
+        padding: theme.spacing(3),
+        display: "flex",
+        justifyContent: "space-around"
+    },
+    fab: {
+        marginLeft: theme.spacing(4),
+    },
+    tooltip: {
+        maxWidth: "45vw",
+        minWidth: "45vw",
+        maxHeight: "50vh",
+    },
+    accordionTitle: {
+        fontSize: "1.2rem"
+    },
+    accordion: {
+        marginTop: theme.spacing(3),
+    },
+    box: {
+        marginBottom: theme.spacing(3)
+    },
+    accordionDetails: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    accordionTypoDetails: {
+        marginBottom: theme.spacing(3),
+        textDecoration: "underline"
+    },
+    accordionTypoTips: {
+        marginBottom: theme.spacing(3),
+    },
+    page: {
+        display: "flex",
+        flexDirection: "row",
+        backgroundColor: '#E4E4E4'
+    },
+    section: {
+        margin: 10,
+        padding: 10,
+        flexGrow: 1,
+        width: "33%",
+        backgroundColor: "red"
+    },
+}));
 
 export default AddArchive;
 

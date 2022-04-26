@@ -16,8 +16,6 @@ const DashboardUser = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
     const [rowData, setRowData] = useState([]);
     const [params, setParams] = useState([]);
-    // const [api, setApi] = useState([]);
-    // const [gridApi, setGridApi] = useState([]);
     const [errOccured, setErrOccured] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("En cours de chargement");
     const userHRA = localStorage.getItem('userHRA');
@@ -30,7 +28,11 @@ const DashboardUser = (props) => {
         fetch(API_URL + "archives/hra/" + userHRA)
             .then(result => result.json())
             .then((rd) => {
-                setRowData(rd);
+                if (rd.length === 0) {
+                    document.getElementById('overlayText').innerText = 'Pas de données';
+                } else {
+                    setRowData(rd);
+                }
                 GeneratePdfService.generateQrList(rd, "QrHiddenHolder", true);
             })
             .catch(() => {
@@ -44,7 +46,7 @@ const DashboardUser = (props) => {
     };
 
     const gridOption = {
-        overlayLoadingTemplate : '<span class="ag-overlay-loading-center">' + loadingMessage + '</span>',
+        overlayLoadingTemplate : '<span class="ag-overlay-loading-center" id="overlayText">' + loadingMessage + '</span>',
     }
 
     const defaultColDef = {
@@ -56,23 +58,27 @@ const DashboardUser = (props) => {
     const actionRenderer = (params) => {
         return (
         <span style={{display: "flex", alignItems: "center"}}>
-            {params.data.status === 'Archivage demandé' &&
+            { params.data.statusCode === 2 &&
             <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Annuler la demande</p>}>
                 <IconButton size={"small"} onClick={() => handleOpen(params)} >
                     <FcCancel size={"1.4em"} />
                 </IconButton>
             </Tooltip>
             }
-            <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Imprimer l'étiquette</p>}>
-                <IconButton size={"small"} onClick={() => handleEtiquette(params)} >
-                    <LocalOffer size={"1.4em"} />
+            { params.data.statusCode === 1 &&
+            <Tooltip title={<p style={{fontSize: '1.4em'}}>Imprimer l'étiquette</p>}>
+                <IconButton size={"small"} onClick={() => handleEtiquette(params)}>
+                    <LocalOffer size={"1.4em"}/>
                 </IconButton>
             </Tooltip>
-            <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Imprimer le bordereau</p>}>
-                <IconButton size={"small"} onClick={() => handleBordereau(params)} >
-                    <FiFileText size={"1.4em"} />
+            }
+            {params.data.statusCode === 1 &&
+            <Tooltip title={<p style={{fontSize: '1.4em'}}>Imprimer le bordereau</p>}>
+                <IconButton size={"small"} onClick={() => handleBordereau(params)}>
+                    <FiFileText size={"1.4em"}/>
                 </IconButton>
             </Tooltip>
+            }
         </span>
         )
     }
@@ -117,8 +123,29 @@ const DashboardUser = (props) => {
         setOpen(false);
     };
 
-    const handleDelete = () => {
+    /*const handleDelete = () => {
         ArchiveService.deleteArchive(line.id).then(() => {
+            let rowToDelete = params.node.data;
+            params.api.applyTransaction({remove : [rowToDelete]});
+            setLine(null);
+            setOpen(false);
+        });
+    }*/
+
+    const handleCancel = () => {
+        switch (params.data.statusCode) {
+            case 1 :
+                break;
+            case 2 :
+                params.data.status = "Archivé";
+                params.data.statusCode = 0;
+                params.data.consultation = {};
+                break;
+            default: break;
+        }
+        let archive = params.data;
+
+        ArchiveService.putArchive(archive).then(() => {
             let rowToDelete = params.node.data;
             params.api.applyTransaction({remove : [rowToDelete]});
             setLine(null);
@@ -139,7 +166,6 @@ const DashboardUser = (props) => {
         let linkedArchives = [];
 
         rowsToDisplay.forEach(row => {
-            console.log(row.data.group, params.data.group);
             if(params.data.group === row.data.group) {
                 linkedArchives.push(row.data);
             }
@@ -162,7 +188,11 @@ const DashboardUser = (props) => {
             }
         });
         archivesBordereau = linkedArchives;
-        const doc = GeneratePdfService.generateBordereauVersement(archivesBordereau);
+
+        let doc = GeneratePdfService.generateBordereauVersement(archivesBordereau);
+        if (params.data.statusCode === 2) {
+            doc = GeneratePdfService.generateBordereauVersement(archivesBordereau, true, 'consultation');
+        }
         GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
     }
 
@@ -239,10 +269,10 @@ const DashboardUser = (props) => {
                 aria-describedby="parent-modal-description"
             >
                 <Box style={style}>
-                    <h2 id="parent-modal-title">Supprimer l'élément ?</h2>
+                    <h2 id="parent-modal-title">Annuler la demande ?</h2>
                     <p id="parent-modal-description">
                         Attention, vous allez annuler la demande. <br />
-                        Ceci aura pour effet de supprimer la cote : <b>{line !== null ? line.cote : ''}</b> <br />
+                        Ceci aura pour effet d'annuler la requête sur l'élément : <b>{line !== null ? line.cote : ''}.</b> <br />
                         Voulez-vous continuer ?
                     </p>
                     <div style={{
@@ -250,7 +280,7 @@ const DashboardUser = (props) => {
                         justifyContent: "space-evenly"
                     }}>
                         <Button color={"secondary"} onClick={handleClose}>Non</Button>
-                        <Button variant="contained" color={"primary"} onClick={() => handleDelete(props.node)}>Oui, supprimer {line !== null ? line.cote : ''}</Button>
+                        <Button variant="contained" color={"primary"} onClick={() => handleCancel(props.node)}>Oui</Button>
                     </div>
                 </Box>
             </Modal>

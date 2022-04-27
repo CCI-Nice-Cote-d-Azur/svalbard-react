@@ -1,3 +1,4 @@
+import '@fontsource/roboto';
 import './app.css';
 import React, {useEffect, useState} from 'react';
 import Archives from "./archives/archives";

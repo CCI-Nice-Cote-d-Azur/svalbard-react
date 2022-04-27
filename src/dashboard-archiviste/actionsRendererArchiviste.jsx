@@ -11,7 +11,7 @@ const actionRendererArchiviste =  (props) => {
     let statusCode = props.data.statusCode;
 
     //TODO:  singleArchive permet de de définir si on veut valider une ligne ou si on veut valider toutes les lignes en bulk (il faudra ajouter cette fonction plus tard).
-    const validerArchivage = () => {
+    const validerArchivage = (isVersementPal) => {
         switch(archive.statusCode) {
             case 1 :
                 archive.statusCode = 11;
@@ -30,8 +30,8 @@ const actionRendererArchiviste =  (props) => {
                 archive.status = 'En cours de remise aux AD';
                 break;
             case 11 :
-                archive.statusCode = 21;
-                archive.status = 'Archivé au PAL';
+                archive.statusCode = 0;
+                archive.status = 'Archivé';
                 break;
             case 12:
                 archive.statusCode = 22;
@@ -50,10 +50,10 @@ const actionRendererArchiviste =  (props) => {
         }
         let isGroupGlobalObject = determineIfGroup();
 
-        if (isGroupGlobalObject.isGroup) {
+        if (isGroupGlobalObject.isGroup && !isVersementPal) {
             ArchiveService.putArchiveMany(archive).then(() => callReRenderFromParent());
         } else {
-            ArchiveService.putArchive(archive).then(() => props.api.redrawRows());
+            ArchiveService.putArchive(archive).then(() => { callReRenderFromParent(); props.api.redrawRows() });
         }
     }
 
@@ -125,6 +125,14 @@ const actionRendererArchiviste =  (props) => {
         GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
     }
 
+    const verifyLocalisationThenValidate = () => {
+        if (props.data.localisation === null || props.data.localisation === 'null' || props.data.localisation === '') {
+            return props.context.noLocalisationAlert();
+        } else {
+            return validerArchivage(true);
+        }
+    }
+
     const renderSwitch = () => {
         if (statusCode === 1 || statusCode === 2 || statusCode === 3 || statusCode === 4) {
             return (
@@ -137,7 +145,7 @@ const actionRendererArchiviste =  (props) => {
         } else if (statusCode === 11) {
             return (
                 <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider le versement au PAL</p>}>
-                    <IconButton size={"small"} onClick={() => {validerArchivage()}}>
+                    <IconButton size={"small"} onClick={() => { verifyLocalisationThenValidate() }}>
                         <MdInput color={"#43A047"} size={"1.4em"} />
                     </IconButton>
                 </Tooltip>

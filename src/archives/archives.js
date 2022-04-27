@@ -135,7 +135,7 @@ const Archives = (props) => {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90, hide: true },
-        { field: 'cote', headerName: 'Cote', width: 100},
+        { field: 'cote', headerName: 'Cote', width: 140},
         { field: 'versement', headerName: 'Versement', width: 200},
         { field: 'etablissement', headerName: 'Etablissement', width: 100},
         { field: 'direction', headerName: 'Direction', width: 200, },
@@ -153,12 +153,12 @@ const Archives = (props) => {
         columns.splice(8, 0, {
             field: 'extremes',
             headerName: 'Extremes',
-            width: columns.length * 18,
+            width: columns.length * 14,
         });
         columns.splice(9, 0, {
             field: 'elimination',
             headerName: 'Elimination',
-            width: columns.length * 18,
+            width: columns.length * 14,
         });
     }
 

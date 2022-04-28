@@ -10,8 +10,7 @@ const actionRendererArchiviste =  (props) => {
     let archive = props.data;
     let statusCode = props.data.statusCode;
 
-    //TODO:  singleArchive permet de de définir si on veut valider une ligne ou si on veut valider toutes les lignes en bulk (il faudra ajouter cette fonction plus tard).
-    const validerArchivage = (isVersementPal) => {
+    const validerArchivage = (isVersementPal = false) => {
         switch(archive.statusCode) {
             case 1 :
                 archive.statusCode = 11;
@@ -29,6 +28,10 @@ const actionRendererArchiviste =  (props) => {
                 archive.statusCode = 14;
                 archive.status = 'En cours de remise aux AD';
                 break;
+            case 5 :
+                archive.statusCode = 11;
+                archive.status = 'En cours de versement au PAL';
+                break;
             case 11 :
                 archive.statusCode = 0;
                 archive.status = 'Archivé';
@@ -44,6 +47,10 @@ const actionRendererArchiviste =  (props) => {
             case 14 :
                 archive.statusCode = 24;
                 archive.status = 'Archivé aux Archives Départementales';
+                break;
+            case 22:
+                archive.statusCode = 5;
+                archive.status = 'Remise au PAL demandée';
                 break;
             default :
                 break;
@@ -72,7 +79,7 @@ const actionRendererArchiviste =  (props) => {
         let linkedArchivesIndexes = [];
 
         rowsToDisplay.forEach((row, index) => {
-            if(archive.group === row.data.group) {
+            if(archive.group === row.data.group && archive.group !== null) {
                 linkedArchives.push(row.data);
                 linkedArchivesIndexes.push(index);
             }
@@ -134,7 +141,7 @@ const actionRendererArchiviste =  (props) => {
     }
 
     const renderSwitch = () => {
-        if (statusCode === 1 || statusCode === 2 || statusCode === 3 || statusCode === 4) {
+        if (statusCode === 1 || statusCode === 2 || statusCode === 3 || statusCode === 4 || statusCode === 5 ) {
             return (
                 <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Valider la demande</p>}>
                     <IconButton size={"small"} onClick={() => {validerArchivage()}}>

@@ -70,7 +70,6 @@ const App = () => {
                     }
                     return isArchivisteOrNot;
                 }).catch(() => {
-
             });
         } else {
             setIsAuthenticated(false);

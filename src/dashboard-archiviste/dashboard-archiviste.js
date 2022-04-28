@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {createStyles, makeStyles} from "@material-ui/core";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
-import ActionRendererArchiviste from './actionsRendererArchiviste.jsx';
+import ActionRendererArchiviste from './actionsRendererArchiviste';
 import GeneratePdfService from "../_services/generatepdf.service";
 import ArchiveService from '../_services/archive.service';
 import {Alert} from "@material-ui/lab";

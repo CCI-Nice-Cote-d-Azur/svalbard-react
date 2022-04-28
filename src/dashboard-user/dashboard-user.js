@@ -25,7 +25,7 @@ const DashboardUser = (props) => {
     let onGridReady = (params) => {
         // setApi(params.api);
 
-        fetch(API_URL + "archives/hra/" + userHRA)
+        fetch(API_URL + "archives/hra/notArchived/" + userHRA)
             .then(result => result.json())
             .then((rd) => {
                 if (rd.length === 0) {
@@ -101,7 +101,6 @@ const DashboardUser = (props) => {
             floatingFilterComponentParams: {
                 suppressFilterButton: true,
             },
-            cellRenderer: 'statusCodeToText'
         },
         {
             field: "actions",

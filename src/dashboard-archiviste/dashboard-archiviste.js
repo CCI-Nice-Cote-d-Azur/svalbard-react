@@ -1,56 +1,76 @@
 import React, {useState} from "react";
 import {createStyles, makeStyles} from "@material-ui/core";
-import Alert from "@material-ui/lab/Alert";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
-import ActionRendererArchiviste from './actionsRendererArchiviste.jsx';
+import ActionRendererArchiviste from './actionsRendererArchiviste';
 import GeneratePdfService from "../_services/generatepdf.service";
 import ArchiveService from '../_services/archive.service';
+import {Alert} from "@material-ui/lab";
+import Snackbar from '@material-ui/core/Snackbar';
 
 const DashboardArchiviste = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
     const [rowData, setRowData] = useState([]);
-    const [errOccured, setErrOccured] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState("Pas de données");
+    const [message, setMessage] = useState("Pas de données");
+    const [open, setOpen] = React.useState(false);
 
     let onGridReady = (params) => {
+        getTableData(params, false);
+    };
 
+    const getTableData = (params?, reRender?) => {
         fetch(API_URL + "archives/allButArchived")
             .then(result => result.json())
             .then(rowData => {
                 GeneratePdfService.generateQrList(rowData, "QrHiddenHolder", true);
-                setRowData(rowData)
+                setRowData(rowData);
             })
             .catch(() => {
-                /*console.log(err);
-                if (err === 'TypeError: can\'t access property "map", archivesArray is undefined') {
-                    setErrOccured(true);
-                    setLoadingMessage("Pas de données");
-                }*/
-                setErrOccured(true);
-                setLoadingMessage("Impossible de se connecter au serveur");
+                setMessage("Impossible de se connecter au serveur");
+                handleClick();
             });
-        setTimeout(() => {
-            params.api.showLoadingOverlay();
-        }, 0);
+        if (!reRender) {
+            setTimeout(() => {
+                params.api.showLoadingOverlay();
+            }, 0);
+        }
+    }
+
+    const handleClick = () => {
+        setOpen(true);
     };
 
-    const gridOption = {
-        overlayLoadingTemplate : '<span class="ag-overlay-loading-center">' + loadingMessage + '</span>',
-        rowClass: "archiviste-table",
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
+    };
 
+    const reRender = () => {
+        getTableData(null, true);
+    }
+
+    const noLocalisationAlert = () => {
+        setMessage('Merci de renseigner une localisation pour l\'archive que vous tentez de valider ')
+        handleClick();
+    }
+
+    const gridOption = {
+        overlayLoadingTemplate : '<span class="ag-overlay-loading-center">' + message + '</span>',
+        rowClass: "archiviste-table",
+        enableCellChangeFlash: true,
         getRowStyle: params => {
-            if (params.data["groupColor"]) {
+            // TODO : Remettre ça en place après les tests
+            /*if (params.data["groupColor"]) {
                 return {'background-color': params.data["groupColor"]}
-            }
+            }*/
         },
 
         onCellValueChanged: (params) => {
             if (params.oldValue !== params.newValue) {
                 let archiveLocalisationUpdate = params.data;
                 archiveLocalisationUpdate.localisation = params.newValue;
-                ArchiveService.putArchive(archiveLocalisationUpdate).then(res => {
-                    console.log(res)
-                });
+                ArchiveService.putArchive(archiveLocalisationUpdate).then(() => {});
             }
         }
     }
@@ -61,81 +81,15 @@ const DashboardArchiviste = (props) => {
         resizable: true,
     }
 
-    const columnDefs = [
-        {
-            field: "versement",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            maxWidth: 110
-        },
-        {
-            field: 'cote',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            maxWidth: 100
-        },
-        {
-            field: 'nom',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            minWidth: 100,
-            maxWidth: 140
-        },
-        {
-            field: 'prenom',
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            minWidth: 100,
-            maxWidth: 140
-        },
-        {
-            field: "etablissement",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            // maxWidth: 100,
-        },
-        {
-            field: "direction",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-        },
-        {
-            field: "service",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-        },
-        {
-            field: "status",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            cellRenderer: 'statusCodeToText',
-            minWidth: 250
-        },
-        {
-            field: "localisation",
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            editable: true,
-            /*minWidth: 300*/
-        },
-        {
-            field: "actions",
-            /*minWidth: 400,*/
-            floatingFilterComponentParams: {
-                suppressFilterButton: true,
-            },
-            cellRenderer: 'actionRenderer'
-        }
-    ]
+    const columnDefs =
+        [{field: "versement",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},{field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
+        {field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},{field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
+        {field: "direction",floatingFilterComponentParams: {suppressFilterButton: true,},},
+        {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},},
+        {field: "status",floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 250},
+        {field: "localisation",floatingFilterComponentParams: {suppressFilterButton: true,},editable: true,/*minWidth: 300*/},
+        {field: "actions",/*minWidth: 400,*/floatingFilterComponentParams: {suppressFilterButton: true,}, cellRenderer: 'actionRenderer'}]
 
     const useStyles = makeStyles(theme => {
         createStyles({
@@ -155,15 +109,13 @@ const DashboardArchiviste = (props) => {
                      height: '80vh',
                      margin: '20px'
                  }}>
-                {errOccured && (
-                    <Alert
-                        severity="danger"
-                        style={{
-                            marginTop: "1rem"
-                        }}>
-                        {loadingMessage}
-                    </Alert>
-                )}
+                <div>
+                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                        <Alert variant={"filled"} onClose={handleClose} severity="warning">
+                            {message}
+                        </Alert>
+                    </Snackbar>
+                </div>
                 <AgGridReact
                     frameworkComponents={{
                         actionRenderer: ActionRendererArchiviste,
@@ -174,6 +126,7 @@ const DashboardArchiviste = (props) => {
                     defaultColDef={defaultColDef}
                     onGridReady={onGridReady}
                     columnDefs={columnDefs}
+                    context={{reRender, noLocalisationAlert}}
                 >
                     <AgGridColumn field="versement" />
                     <AgGridColumn field="cote" />

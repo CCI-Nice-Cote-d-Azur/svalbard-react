@@ -42,8 +42,10 @@ body, html {
     border-radius: 5px;
 }
 
-.ag-cell-wrapper {
-    align-items: baseline !important;
+.ag-cell-value {
+    display: flex !important;
+    justify-content: left !important;
+    align-items: center !important;
 }
 
 .ag-checkbox-input {
@@ -57,5 +59,15 @@ body, html {
 
 .ag-theme-alpine-dark .ag-checkbox {
     margin-right: 1em;
+}
+
+.row-fail {
+    background-color: #bfbfbf !important;
+    color: #8d8d8d !important;
+    pointer-events: none;
+}
+
+#validateButton {
+    margin: 8px !important;
 }
 

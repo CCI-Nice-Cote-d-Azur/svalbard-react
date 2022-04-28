@@ -1,3 +1,4 @@
+import '@fontsource/roboto';
 import './app.css';
 import React, {useEffect, useState} from 'react';
 import Archives from "./archives/archives";
@@ -69,7 +70,6 @@ const App = () => {
                     }
                     return isArchivisteOrNot;
                 }).catch(() => {
-
             });
         } else {
             setIsAuthenticated(false);
@@ -114,7 +114,7 @@ const App = () => {
     const monEspace = [
         isArchiviste ?
         {
-            text: 'Demandes d\'archivage',
+            text: 'Demandes utilisateurs',
             icon: <DashboardIcon />,
             url: '/demandes-archivage'
         }
@@ -235,7 +235,7 @@ const App = () => {
                 <Switch>
                     <Route exact path={"/archive"}>
                         {isAuthenticated ? (
-                            <Archives drawerWidth={drawerWidth} darkModeEnabled={prefersDarkMode} />
+                            <Archives drawerWidth={drawerWidth} isArchiviste={isArchiviste} darkModeEnabled={prefersDarkMode} />
                         ) : (
                             <Login stateChanger={setIsAuthenticated} drawerWidth={drawerWidth} />
                         )}

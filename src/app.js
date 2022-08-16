@@ -19,6 +19,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import PersonIcon from '@material-ui/icons/Person';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 import {
     HashRouter,
     Switch,
@@ -118,12 +120,12 @@ const App = () => {
         [
             {
                 text: 'Demandes utilisateurs',
-                icon: <DashboardIcon />,
+                icon: <PersonIcon />,
                 url: '/demandes-archivage'
             },
             {
                 text: 'Destructions prévues',
-                icon: <DashboardIcon />,
+                icon: <WhatshotIcon />,
                 url: '/destroy-archive'
             }
         ]

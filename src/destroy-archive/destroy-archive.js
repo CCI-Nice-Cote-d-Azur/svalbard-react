@@ -1,5 +1,7 @@
-import React, {useState} from 'react';
-import {makeStyles} from "@material-ui/core/styles";
+
+/*import React from 'react';
+{useState}*/
+/*import {makeStyles} from "@material-ui/core/styles";
 import Snackbar from "@material-ui/core/Snackbar";
 import {Alert} from "@material-ui/lab";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
@@ -11,10 +13,10 @@ import {Accordion, AccordionDetails, AccordionSummary, createStyles} from "@mate
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import {DataGrid} from "@material-ui/data-grid";
+import {DataGrid} from "@material-ui/data-grid";*/
 
 const DestroyArchive = (props) => {
-    let history = useHistory();
+/*    let history = useHistory();
     const API_URL = process.env.REACT_APP_API_URL
     const [selectedRows, setSelectedRows] = useState([]);
     // const [expanded, setExpanded] = useState(false);
@@ -81,7 +83,7 @@ const DestroyArchive = (props) => {
         editable: () => {return props.isArchiviste},
     }
 
-    const columns = [
+    /!*const columns = [
         { field: 'id', headerName: 'ID', width: 90, hide: true },
         { field: 'cote', headerName: 'Cote', width: 140},
         { field: 'versement', headerName: 'Versement', width: 200},
@@ -93,7 +95,7 @@ const DestroyArchive = (props) => {
         { field: 'extremes', headerName: 'Extremes', width: columns.length * 14},
         { field: 'elimination', headerName: 'Elimination', width: columns.length * 14 }
     ];
-
+*!/
 
 
     const useStyles = makeStyles(theme => {
@@ -112,7 +114,7 @@ const DestroyArchive = (props) => {
             style={{
                 paddingLeft: props.drawerWidth,
             }}>
-            {/*<Button variant="outlined" style={{marginLeft: "2em", marginTop: "1em"}} onClick={getSelectedRows}>{  }</Button>*/}
+            {/!*<Button variant="outlined" style={{marginLeft: "2em", marginTop: "1em"}} onClick={getSelectedRows}>{  }</Button>*!/}
             <Accordion className={classes.accordion}>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -131,7 +133,7 @@ const DestroyArchive = (props) => {
                         >
                             Demander à consulter</Button>
                     )}
-                    <DataGrid
+                    {/!*<DataGrid
                         rows={selectedRows}
                         columns={columns}
                         pageSize={10}
@@ -140,7 +142,7 @@ const DestroyArchive = (props) => {
                         style={{height: 640}}
                         columnBuffer={2} headerHeight={56} localeText={''} rowHeight={52} sortingOrder={['asc', 'desc', null]}
                         // onRowClick={onRowClicked}
-                    />
+                    />*!/}
                 </AccordionDetails>
             </Accordion>
             <div className={props.darkModeEnabled ? "ag-theme-alpine-dark" : "ag-theme-alpine"}>
@@ -159,7 +161,7 @@ const DestroyArchive = (props) => {
                             {loadingMessage}
                         </Alert>
                     )}
-                    <AgGridReact
+                    {/!*<AgGridReact
                         gridOptions={gridOptions}
                         suppressRowClickSelection={true}
                         rowSelection={'multiple'}
@@ -183,12 +185,14 @@ const DestroyArchive = (props) => {
                         <AgGridColumn field="dossiers" />
                         <AgGridColumn field="extremes"/>
                         <AgGridColumn field="elimination" />
-
-                    </AgGridReact>
+                    </AgGridReact>*!/}
                 </div>
             </div>
         </div>
     );
+
+ */
 }
 
 export default DestroyArchive;
+

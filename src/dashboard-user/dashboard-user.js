@@ -11,6 +11,7 @@ import {LocalOffer} from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
 import ArchiveService from '../_services/archive.service';
 import GeneratePdfService from "../_services/generatepdf.service";
+import MailService from "../_services/mail.service";
 
 const DashboardUser = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -144,12 +145,14 @@ const DashboardUser = (props) => {
         }
         let archive = params.data;
 
-        ArchiveService.putArchive(archive).then(() => {
+        ArchiveService.putArchive(archive)
+            .then(() => {
             let rowToDelete = params.node.data;
             params.api.applyTransaction({remove : [rowToDelete]});
             setLine(null);
             setOpen(false);
-        });
+        })
+            .then(MailService.getAnnulationDemandeConsultationArchive);
     }
 
     const getAllRows = (params) => {
@@ -212,7 +215,6 @@ const DashboardUser = (props) => {
         padding: 20,
         bgcolor: 'background.paper',
         border: '2px solid #000',
-        boxShadow: 24,
         pt: 2,
         px: 4,
         pb: 3,
@@ -278,8 +280,8 @@ const DashboardUser = (props) => {
                         display: 'flex',
                         justifyContent: "space-evenly"
                     }}>
-                        <Button color={"secondary"} onClick={handleClose}>Non</Button>
-                        <Button variant="contained" color={"primary"} onClick={() => handleCancel(props.node)}>Oui</Button>
+                        <Button type={"button"} color={"secondary"} onClick={handleClose}>Non</Button>
+                        <Button type={"button"} variant="contained" color={"primary"} onClick={() => handleCancel(props.node)}>Oui</Button>
                     </div>
                 </Box>
             </Modal>

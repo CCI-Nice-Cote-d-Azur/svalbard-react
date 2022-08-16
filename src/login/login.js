@@ -51,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
 const Login = (props) => {
     const [compte, setCompte] = useState("");
     const [HRA, setHRA] = useState("");
-    // const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [spinner, setSpinner] = useState(false);
 
@@ -76,7 +75,7 @@ const Login = (props) => {
                         } else {
                             props.history.push(props.history.location.pathname);
                         }
-                        // window.location.reload();
+                        window.location.reload();
                     }
                     setSpinner(false);
                 }

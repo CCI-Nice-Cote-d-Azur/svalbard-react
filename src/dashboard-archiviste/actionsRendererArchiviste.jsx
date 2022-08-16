@@ -5,6 +5,7 @@ import IconButton from "@material-ui/core/IconButton";
 import ArchiveService from '../_services/archive.service';
 import GeneratePdfService from "../_services/generatepdf.service";
 import {LocalOffer, Style} from "@material-ui/icons";
+import MailService from "../_services/mail.service";
 
 const actionRendererArchiviste =  (props) => {
     let archive = props.data;
@@ -19,6 +20,7 @@ const actionRendererArchiviste =  (props) => {
             case 2:
                 archive.statusCode = 12;
                 archive.status = 'En cours de récupération au PAL';
+                MailService.getValidationDemandeConsultationArchive().then();
                 break;
             case 3:
                 archive.statusCode = 13;

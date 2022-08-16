@@ -19,6 +19,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import PersonIcon from '@material-ui/icons/Person';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 import {
     HashRouter,
     Switch,
@@ -29,14 +31,16 @@ import MaterialSwitch from "@material-ui/core/Switch"
 import Home from "./home/home";
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import axios from "axios";
+import createTheme from "@material-ui/core/styles/createTheme";
 import AccessRefused from "./access-denied/access-refused";
 import AddArchive from "./add-archive/add-archive";
 import Login from "./login/login";
-import DashboardUser from "./dashboard-user/dashboard-user";
-import axios from "axios";
-import DashboardArchiviste from "./dashboard-archiviste/dashboard-archiviste";
-import createTheme from "@material-ui/core/styles/createTheme";
 import Logout from "./logout/logout";
+import DashboardUser from "./dashboard-user/dashboard-user";
+import DashboardArchiviste from "./dashboard-archiviste/dashboard-archiviste";
+import DestroyArchive from "./destroy-archive/destroy-archive";
+
 require('dotenv').config();
 
 const App = () => {
@@ -111,20 +115,28 @@ const App = () => {
         },
         ];
 
-    const monEspace = [
-        isArchiviste ?
-        {
-            text: 'Demandes utilisateurs',
-            icon: <DashboardIcon />,
-            url: '/demandes-archivage'
-        }
-        :
-        {
+    const monEspace = isArchiviste
+    ?
+        [
+            {
+                text: 'Demandes utilisateurs',
+                icon: <PersonIcon />,
+                url: '/demandes-archivage'
+            },
+            {
+                text: 'Destructions prévues',
+                icon: <WhatshotIcon />,
+                url: '/destroy-archive'
+            }
+        ]
+    :
+        [
+            {
             text: 'Mes demandes',
             icon: <DashboardIcon />,
             url: '/mes-demandes'
-        }
-    ];
+            }
+        ];
 
     // En cas de modif, il faut aussi modifier .MuiDrawer-paperAnchorLeft dans le CSS de archive.css
     const drawerWidth = 270;
@@ -258,13 +270,20 @@ const App = () => {
                         <Logout stateChanger={setIsAuthenticated} drawerWidth={drawerWidth} />
                     </Route>
                     {isArchiviste ? (
-                        <Route exact path={"/demandes-archivage"}>
+                        [<Route exact path={"/demandes-archivage"}>
                             {isAuthenticated ? (
                                 <DashboardArchiviste drawerWidth={drawerWidth} darkModeEnabled={prefersDarkMode} />
                             ) : (
                                 <Login stateChanger={setIsAuthenticated} drawerWidth={drawerWidth} />
                             )}
-                        </Route>
+                        </Route>,
+                        <Route exact path={"/destroy-archive"}>
+                            {isAuthenticated ? (
+                                <DestroyArchive drawerWidth={drawerWidth} darkModeEnabled={prefersDarkMode} />
+                            ) : (
+                                <Login stateChanger={setIsAuthenticated} drawerWidth={drawerWidth} />
+                            )}
+                        </Route>]
                     ) : (
                         <Route exact path={"/mes-demandes"}>
                             {isAuthenticated ? (

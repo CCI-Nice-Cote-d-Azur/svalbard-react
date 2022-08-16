@@ -1,8 +1,8 @@
 import axios from "axios";
+import mailService from "./mail.service";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const token = localStorage.getItem("userToken");
-
     /*const getAllArchives = () => {
 
     }*/
@@ -178,6 +178,7 @@ const token = localStorage.getItem("userToken");
                 }
             })
             .then(res => {
+                mailService.getDemandeConsultationArchive().then();
                 return res.data;
             })
             .catch(error => {

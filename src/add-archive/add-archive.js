@@ -208,7 +208,6 @@ const AddArchive = (props) => {
         GeneratePdfService.downloadOnClick(doc, "bordereauBtnHolder", "bordereau", false);
         /*onQRGenerate(archivesArray);*/
         // archivesArray = [];
-
     }
 
     const handleNext = () => {

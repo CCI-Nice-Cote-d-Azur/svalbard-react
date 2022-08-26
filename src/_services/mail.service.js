@@ -359,5 +359,4 @@ const MailService = {
     getAnnulationDemandeAjoutArchive,
     //endregion
 }
-
 export default MailService;

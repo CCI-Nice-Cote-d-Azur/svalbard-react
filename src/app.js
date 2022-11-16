@@ -113,7 +113,7 @@ const App = () => {
             icon: <AddBoxIcon />,
             url: '/ajouter-archive'
         },
-        ];
+    ];
 
     const monEspace = isArchiviste
     ?

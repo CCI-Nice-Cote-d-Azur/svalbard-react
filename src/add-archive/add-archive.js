@@ -106,6 +106,7 @@ const AddArchive = (props) => {
 
     const [activeStep, setActiveStep] = React.useState(0);
     const [lastCoteObj, setLastCoteObj] = React.useState('');
+    const [lastCote, setLastCote] = React.useState('');
     const [inputValue, setInputValue] = React.useState('');
     const [cotesList, setCotesList] = React.useState([]);
     const [errMessage, setErrMessage] = React.useState('');
@@ -123,10 +124,9 @@ const AddArchive = (props) => {
     const generateDataGrid = (value) => {
         let tempArr = [];
         for (let i = 1; i <= value; i++) {
-
-            let temp = (Number(lastCoteObj["cote"].substr(3)) + i).toString();
+            let temp = (Number(lastCote.substr(4)) + i).toString();
             temp = MiscService.addTrailingZeroes(temp);
-            let cote = lastCoteObj["cote"].substr(0, 3) + temp;
+            let cote = lastCote.substr(0, 4) + temp;
 
             tempArr.push({
                 id: i,
@@ -282,7 +282,7 @@ const AddArchive = (props) => {
                         </Collapse>
                         <TextField
                             id="outlined-basic"
-                            value={inputValue.length === 3 ? lastCoteObj["cote"] : inputValue}
+                            value={inputValue.length === 3 ? lastCote : inputValue}
                             inputProps={{ maxLength: 3 }}
                             variant="outlined"
                             onChange={fetchCote}
@@ -366,8 +366,9 @@ const AddArchive = (props) => {
                     }
                 })
                 .then(elm => {
-                    MiscService.addTrailingZeroes(elm.cote);
-                    setLastCoteObj(elm);
+                    const reworkCote = MiscService.addZeroes(MiscService.addTrailingZeroes(elm.cote));
+                    console.log(reworkCote);
+                    setLastCote(reworkCote);
                 });
         } else {
             // Demander à l'utilsateur de renseigner au moins 2 caractères

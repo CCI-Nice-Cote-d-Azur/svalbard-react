@@ -1,24 +1,69 @@
 import React, {useState} from "react";
+import PropTypes from "prop-types";
 import ArchiveService from "../_services/archive.service";
 import {createStyles, makeStyles} from "@material-ui/core";
 import Snackbar from "@material-ui/core/Snackbar";
 import {Alert} from "@material-ui/lab";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
-import ActionRendererArchiviste from "../dashboard-archiviste/actionsRendererArchiviste";
+import ActionsRendererDestroy from "../destroy-archive/actionsRendererDestroy";
+import LogoExcel from "../assets/images/excel_logo.png";
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
+
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};
 
 const DestroyArchive = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
+    const [gridApi, setGridApi] = useState([]);
     const [rowData, setRowData] = useState([]);
     const [message, setMessage] = useState("Pas de données");
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const [destructionCount, setDestructionCount] = useState();
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
     let onGridReady = (params) => {
+        setGridApi(params.api);
         getTableData(params, false);
     };
 
-    const getTableData = (params?, reRender?) => {
-        fetch(API_URL + "archives/toDestroy")
+    const getTableData = (params?, reRender?, reRenderParam?) => {
+        if (typeof reRenderParam === "undefined") {
+            reRenderParam = 'toDestroy';
+        }
+        fetch(API_URL + "archives/" + reRenderParam)
             .then(result => result.json())
             .then(rowData => {
                 // GeneratePdfService.generateQrList(rowData, "QrHiddenHolder", true);
@@ -47,14 +92,18 @@ const DestroyArchive = (props) => {
         setOpen(false);
     };
 
-    const reRender = () => {
-        getTableData(null, true);
-    }
+    const reRender = (parameter?) => {
+        getTableData(null, true, parameter);
+    };
 
     const noLocalisationAlert = () => {
         setMessage('Merci de renseigner une localisation pour l\'archive que vous tentez de valider ')
         handleClick();
-    }
+    };
+
+    const onBtnExport = () => {
+        gridApi.exportDataAsCsv();
+    };
 
     const gridOption = {
         overlayLoadingTemplate : '<span class="ag-overlay-loading-center">' + message + '</span>',
@@ -85,14 +134,14 @@ const DestroyArchive = (props) => {
     const columnDefs =
         [{field: "elimination",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},
         {field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
-        {field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
-        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        /*{field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},*/
         {field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
         {field: "direction",floatingFilterComponentParams: {suppressFilterButton: true,},},
-        {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},},
+        {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},sortable: true},
         {field: "status",floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 250},
-        {field: "localisation",floatingFilterComponentParams: {suppressFilterButton: true,},editable: true,/*minWidth: 300*/}]
-        // {field: "actions",/*minWidth: 400,*/floatingFilterComponentParams: {suppressFilterButton: true,}, cellRenderer: 'actionRenderer'}
+        {field: "localisation",floatingFilterComponentParams: {suppressFilterButton: true,},editable: true, sortable: true/*minWidth: 300*/},
+        {field: "actions",floatingFilterComponentParams: {suppressFilterButton: true}, cellRenderer: 'actionRenderer'}]
 
     const useStyles = makeStyles(theme => {
         createStyles({
@@ -109,40 +158,64 @@ const DestroyArchive = (props) => {
             <div className={classes.content}
                  style={{
                      width: "100%",
-                     height: '80vh',
+                     height: '90vh',
                      margin: '20px'
                  }}>
-                <div>
-                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                        <Alert variant={"filled"} onClose={handleClose} severity="warning">
-                            {message}
-                        </Alert>
-                    </Snackbar>
-                </div>
-                <div>
-                    <p>Nombre d'archives à détruire : {destructionCount}</p>
-                </div>
-                <AgGridReact
-                    frameworkComponents={{
-                        actionRenderer: ActionRendererArchiviste,
-                    }}
-                    gridOptions={gridOption}
-                    rowStyle={{textAlign: 'left'}}
-                    rowData={rowData}
-                    defaultColDef={defaultColDef}
-                    onGridReady={onGridReady}
-                    columnDefs={columnDefs}
-                    context={{reRender, noLocalisationAlert}}
-                >
-                    <AgGridColumn field="destruction" />
-                    <AgGridColumn field="cote" />
-                    <AgGridColumn field="compteVerseur" />
-                    <AgGridColumn field="etablissement" />
-                    <AgGridColumn field="direction" />
-                    <AgGridColumn field="service" />
-                    <AgGridColumn field="status" />
-                    {/*<AgGridColumn field="actions" />*/}
-                </AgGridReact>
+                <Paper className={classes.root}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        centered
+                    >
+                        <Tab label="Item One" />
+                        <Tab label="Item Two" />
+                        <Tab label="Item Three" />
+                    </Tabs>
+                    <TabPanel value={value} index={0}>
+                        <div>
+                            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                                <Alert variant={"filled"} onClose={handleClose} severity="warning">
+                                    {message}
+                                </Alert>
+                            </Snackbar>
+                        </div>
+                        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                            <p>Nombre d'archives à détruire : {destructionCount}</p>
+                            <ButtonGroup variant="outlined" aria-label="outlined button group" style={{marginRight: "10px"}}>
+                                <Button onClick={() => reRender("toDestroy")}>Versement / Destruction</Button>
+                                <Button>Destructions validées par l'AD</Button>
+                                <Button onClick={() => reRender("toGiveToAD")}>Pour versement aux AD</Button>
+                            </ButtonGroup>
+                            <div style={{display: "flex", alignItems: "center"}}>
+
+                                <img src={LogoExcel} alt="Logo Excel" style={{height: '3.5rem', cursor: "pointer"}} onClick={onBtnExport}/>
+                            </div>
+                        </div>
+                        <AgGridReact
+                            frameworkComponents={{
+                                actionRenderer: ActionsRendererDestroy,
+                            }}
+                            gridOptions={gridOption}
+                            rowStyle={{textAlign: 'left'}}
+                            rowData={rowData}
+                            defaultColDef={defaultColDef}
+                            onGridReady={onGridReady}
+                            columnDefs={columnDefs}
+                            context={{reRender, noLocalisationAlert}}
+                        >
+                            <AgGridColumn field="destruction" />
+                            <AgGridColumn field="cote" />
+                            <AgGridColumn field="compteVerseur" />
+                            <AgGridColumn field="etablissement" />
+                            <AgGridColumn field="direction" />
+                            <AgGridColumn field="service" />
+                            <AgGridColumn field="status" />
+                            <AgGridColumn field="actions" />
+                        </AgGridReact>
+                    </TabPanel>
+                </Paper>
             </div>
             <div id={"pdfLabelHolder"} hidden={true} />
             <div id={"pdfBordereauHolder"} hidden={true} />

@@ -22,7 +22,7 @@ Il faut ensuite récupérer le contenu du "build" et le cc/cv dans le dossier pr
 
 `5` - Remise au PAL demandée
 
-`6` - 
+`6` - Remise à l'AD validée par le service versant
 
 `7` - 
 

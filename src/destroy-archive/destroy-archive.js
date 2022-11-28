@@ -161,61 +161,47 @@ const DestroyArchive = (props) => {
                      height: '90vh',
                      margin: '20px'
                  }}>
-                <Paper className={classes.root}>
-                    <Tabs
-                        value={value}
-                        onChange={handleChange}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        centered
-                    >
-                        <Tab label="Item One" />
-                        <Tab label="Item Two" />
-                        <Tab label="Item Three" />
-                    </Tabs>
-                    <TabPanel value={value} index={0}>
-                        <div>
-                            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                                <Alert variant={"filled"} onClose={handleClose} severity="warning">
-                                    {message}
-                                </Alert>
-                            </Snackbar>
-                        </div>
-                        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                            <p>Nombre d'archives à détruire : {destructionCount}</p>
-                            <ButtonGroup variant="outlined" aria-label="outlined button group" style={{marginRight: "10px"}}>
-                                <Button onClick={() => reRender("toDestroy")}>Versement / Destruction</Button>
-                                <Button>Destructions validées par l'AD</Button>
-                                <Button onClick={() => reRender("toGiveToAD")}>Pour versement aux AD</Button>
-                            </ButtonGroup>
-                            <div style={{display: "flex", alignItems: "center"}}>
+                <div>
+                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                        <Alert variant={"filled"} onClose={handleClose} severity="warning">
+                            {message}
+                        </Alert>
+                    </Snackbar>
+                </div>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                    <p>Nombre d'archives à détruire : {destructionCount}</p>
+                    <ButtonGroup variant="outlined" aria-label="outlined button group" style={{marginRight: "10px"}}>
+                        <Button onClick={() => reRender("toDestroy")}>Versement / Destruction</Button>
+                        <Button>Destructions validées par l'AD</Button>
+                        <Button onClick={() => reRender("toGiveToAD")}>Pour versement aux AD</Button>
+                    </ButtonGroup>
+                    <div style={{display: "flex", alignItems: "center"}}>
 
-                                <img src={LogoExcel} alt="Logo Excel" style={{height: '3.5rem', cursor: "pointer"}} onClick={onBtnExport}/>
-                            </div>
-                        </div>
-                        <AgGridReact
-                            frameworkComponents={{
-                                actionRenderer: ActionsRendererDestroy,
-                            }}
-                            gridOptions={gridOption}
-                            rowStyle={{textAlign: 'left'}}
-                            rowData={rowData}
-                            defaultColDef={defaultColDef}
-                            onGridReady={onGridReady}
-                            columnDefs={columnDefs}
-                            context={{reRender, noLocalisationAlert}}
-                        >
-                            <AgGridColumn field="destruction" />
-                            <AgGridColumn field="cote" />
-                            <AgGridColumn field="compteVerseur" />
-                            <AgGridColumn field="etablissement" />
-                            <AgGridColumn field="direction" />
-                            <AgGridColumn field="service" />
-                            <AgGridColumn field="status" />
-                            <AgGridColumn field="actions" />
-                        </AgGridReact>
-                    </TabPanel>
-                </Paper>
+                        <img src={LogoExcel} alt="Logo Excel" style={{height: '3.5rem', cursor: "pointer"}} onClick={onBtnExport}/>
+                    </div>
+                </div>
+                <AgGridReact
+                    frameworkComponents={{
+                        actionRenderer: ActionsRendererDestroy,
+                    }}
+                    gridOptions={gridOption}
+                    rowStyle={{textAlign: 'left'}}
+                    rowData={rowData}
+                    defaultColDef={defaultColDef}
+                    onGridReady={onGridReady}
+                    columnDefs={columnDefs}
+                    context={{reRender, noLocalisationAlert}}
+                >
+                    <AgGridColumn field="destruction" />
+                    <AgGridColumn field="cote" />
+                    <AgGridColumn field="compteVerseur" />
+                    <AgGridColumn field="etablissement" />
+                    <AgGridColumn field="direction" />
+                    <AgGridColumn field="service" />
+                    <AgGridColumn field="status" />
+                    <AgGridColumn field="actions" />
+                </AgGridReact>
+
             </div>
             <div id={"pdfLabelHolder"} hidden={true} />
             <div id={"pdfBordereauHolder"} hidden={true} />

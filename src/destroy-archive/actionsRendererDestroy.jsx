@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoFlame, BiArchiveOut} from "react-icons/all";
+import {GoFlame, BiArchiveOut} from "react-icons/all";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import ArchiveService from '../_services/archive.service';
@@ -119,26 +119,29 @@ const actionsRendererDestroy =  (props) => {
         GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
     }
 
-    return (
-        <span style={{display: "flex", alignItems: "center"}}>
-            { versementActionAllowed ? (
-            <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Signaler pour <span style={{textDecoration: "underline"}}>versement</span> AD</p>}>
-                <IconButton size={"small"} onClick={() => versementDestruction(4)}>
-                    <BiArchiveOut color={"orange"} size={"1.4em"} />
-                </IconButton>
-            </Tooltip>
-            ) : (
-                <span></span>
-            )}
-            { destroyActionAllowed ? (
-                <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Signaler pour <span style={{textDecoration: "underline"}}>destruction</span> AD</p>}>
-                    <IconButton size={"small"} onClick={() => versementDestruction(5)}>
-                        <GoFlame color={"#CF352E"} size={"1.4em"} />
+    const renderSwitch = () => {
+        if (statusCode !== 4) {
+            return (
+                <Tooltip title={<p style={{fontSize: '1.4em'}}>Signaler pour <span style={{textDecoration: "underline"}}>versement</span> AD</p>}>
+                    <IconButton size={"small"} onClick={() => versementDestruction(4)}>
+                        <BiArchiveOut color={"orange"} size={"1.4em"}/>
                     </IconButton>
                 </Tooltip>
-            ) : (
-                <span></span>
-            )}
+            )
+        } else if (statusCode === 6) {
+            return (
+                <Tooltip title={<p style={{fontSize: '1.4em'}}>Signaler pour <span style={{textDecoration: "underline"}}>destruction</span> AD</p>}>
+                    <IconButton size={"small"} onClick={() => versementDestruction(5)}>
+                        <GoFlame color={"#CF352E"} size={"1.4em"}/>
+                    </IconButton>
+                </Tooltip>
+            );
+        }
+    }
+
+    return (
+        <span style={{display: "flex", alignItems: "center"}}>
+            {renderSwitch()}
         </span>
     );
 };

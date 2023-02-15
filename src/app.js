@@ -48,7 +48,8 @@ const App = () => {
     let prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const API_URL = process.env.REACT_APP_API_URL;
 
-    const [darkMode, setDarkMode] = useState([prefersDarkMode]);
+    // const [darkMode, setDarkMode] = useState([prefersDarkMode]);
+    const [darkMode, setDarkMode] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isArchiviste, setIsArchiviste] = useState(false);
 
@@ -132,9 +133,9 @@ const App = () => {
     :
         [
             {
-            text: 'Mes demandes',
+            text: 'Demandes en cours',
             icon: <DashboardIcon />,
-            url: '/mes-demandes'
+            url: '/demandes-en-cours'
             }
         ];
 
@@ -285,7 +286,7 @@ const App = () => {
                             )}
                         </Route>]
                     ) : (
-                        <Route exact path={"/mes-demandes"}>
+                        <Route exact path={"/demandes-en-cours"}>
                             {isAuthenticated ? (
                                 <DashboardUser drawerWidth={drawerWidth} darkModeEnabled={prefersDarkMode} />
                             ) : (

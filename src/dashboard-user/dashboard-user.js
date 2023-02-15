@@ -1,13 +1,10 @@
 import React, {useState} from "react";
+import ActionsRendererDashboardUser from "../dashboard-user/actionsRendererDashboardUser";
 import {createStyles, makeStyles} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
 import Box from "@material-ui/core/Box";
 import Modal from "@material-ui/core/Modal";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import {FcCancel, FiFileText} from "react-icons/all";
-import {LocalOffer} from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
 import ArchiveService from '../_services/archive.service';
 import GeneratePdfService from "../_services/generatepdf.service";
@@ -15,12 +12,14 @@ import MailService from "../_services/mail.service";
 
 const DashboardUser = (props) => {
     const API_URL = process.env.REACT_APP_API_URL;
+    const nullDate = '0001-01-01T00:00:00';
     const [rowData, setRowData] = useState([]);
     const [params, setParams] = useState([]);
     const [errOccured, setErrOccured] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("En cours de chargement");
     const userHRA = localStorage.getItem('userHRA');
     const [open, setOpen] = useState(false);
+    const [openRetourPAL, setOpenRetourPAL] = useState(false);
     const [line, setLine] = useState(null);
 
     let onGridReady = (params) => {
@@ -34,7 +33,7 @@ const DashboardUser = (props) => {
                 } else {
                     setRowData(rd);
                 }
-                GeneratePdfService.generateQrList(rd, "QrHiddenHolder", true);
+                GeneratePdfService.GenerateQrList(rd, "QrHiddenHolder", true);
             })
             .catch(() => {
                 setErrOccured(true);
@@ -54,34 +53,6 @@ const DashboardUser = (props) => {
         flex: 1,
         minWidth: 50,
         resizable: true,
-    }
-
-    const actionRenderer = (params) => {
-        return (
-        <span style={{display: "flex", alignItems: "center"}}>
-            { params.data.statusCode === 2 &&
-            <Tooltip title= {<p style={{ fontSize: '1.4em' }}>Annuler la demande</p>}>
-                <IconButton size={"small"} onClick={() => handleOpen(params)} >
-                    <FcCancel size={"1.4em"} />
-                </IconButton>
-            </Tooltip>
-            }
-            { params.data.statusCode === 1 &&
-            <Tooltip title={<p style={{fontSize: '1.4em'}}>Imprimer l'étiquette</p>}>
-                <IconButton size={"small"} onClick={() => handleEtiquette(params)}>
-                    <LocalOffer size={"1.4em"}/>
-                </IconButton>
-            </Tooltip>
-            }
-            {params.data.statusCode === 1 &&
-            <Tooltip title={<p style={{fontSize: '1.4em'}}>Imprimer le bordereau</p>}>
-                <IconButton size={"small"} onClick={() => handleBordereau(params)}>
-                    <FiFileText size={"1.4em"}/>
-                </IconButton>
-            </Tooltip>
-            }
-        </span>
-        )
     }
 
     const columnDefs = [
@@ -104,6 +75,20 @@ const DashboardUser = (props) => {
             },
         },
         {
+            field: "consultation.dateDemande",
+            headerName: "Date demande de consultation",
+            floatingFilterComponentParams: {
+                suppressFilterButton: true,
+            },
+            cellRenderer: (params) => {
+                if(params.data.consultation.dateDemande && params.data.consultation.dateDemande !== nullDate) {
+                    return params.data.consultation.dateDemande;
+                } else {
+                    return "n/a";
+                }
+            }
+        },
+        {
             field: "actions",
             floatingFilterComponentParams: {
                 suppressFilterButton: true,
@@ -112,15 +97,25 @@ const DashboardUser = (props) => {
         }
     ]
 
-    const handleOpen = (params) => {
+    const handleOpen = (params, retourPAL = false) => {
+        console.log(params);
         setParams(params);
         setLine(params.data);
-        setOpen(true);
+        if (retourPAL) {
+            setOpenRetourPAL(true);
+        } else {
+            setOpen(true);
+        }
     };
 
-    const handleClose = () => {
+    const handleClose = (retourPAL = false) => {
         setLine(null);
-        setOpen(false);
+        if (retourPAL) {
+            setOpenRetourPAL(false);
+        } else {
+            setOpen(false);
+        }
+
     };
 
     /*const handleDelete = () => {
@@ -133,6 +128,8 @@ const DashboardUser = (props) => {
     }*/
 
     const handleCancel = () => {
+        let archive = params.data;
+
         switch (params.data.statusCode) {
             case 1 :
                 break;
@@ -140,18 +137,37 @@ const DashboardUser = (props) => {
                 params.data.status = "Archivé";
                 params.data.statusCode = 0;
                 params.data.consultation = {};
+                deleteArchive(archive);
+                break;
+            case 22 :
+                params.data.status = "En cours de versement au PAL";
+                params.data.statusCode = 11;
+                params.data.consultation = {};
+                updateArchive(archive);
                 break;
             default: break;
         }
-        let archive = params.data;
+    }
 
+    const updateArchive = (archive) => {
+        ArchiveService.putArchive(archive)
+            .then((res) => {
+                console.log(res);
+                let rowToUpdate = params.node.data;
+                params.api.applyTransaction({update : [rowToUpdate]});
+                handleClose(true);
+            });
+            // .then(MailService.getAnnulationDemandeConsultationArchive);
+    }
+
+    const deleteArchive = (archive) => {
         ArchiveService.putArchive(archive)
             .then(() => {
-            let rowToDelete = params.node.data;
-            params.api.applyTransaction({remove : [rowToDelete]});
-            setLine(null);
-            setOpen(false);
-        })
+                let rowToDelete = params.node.data;
+                params.api.applyTransaction({remove : [rowToDelete]});
+                setLine(null);
+                setOpen(false);
+            })
             .then(MailService.getAnnulationDemandeConsultationArchive);
     }
 
@@ -173,8 +189,8 @@ const DashboardUser = (props) => {
             }
         })
         archivesLabel = linkedArchives;
-        const doc = GeneratePdfService.generateEtiquettes(archivesLabel, true);
-        GeneratePdfService.downloadOnClick(doc, "pdfLabelHolder", fileName);
+        const doc = GeneratePdfService.GenerateEtiquettes(archivesLabel, true);
+        GeneratePdfService.DownloadOnClick(doc, "pdfLabelHolder", fileName);
     }
 
     const handleBordereau = (params) => {
@@ -191,11 +207,11 @@ const DashboardUser = (props) => {
         });
         archivesBordereau = linkedArchives;
 
-        let doc = GeneratePdfService.generateBordereauVersement(archivesBordereau);
+        let doc = GeneratePdfService.GenerateBordereauVersement(archivesBordereau);
         if (params.data.statusCode === 2) {
-            doc = GeneratePdfService.generateBordereauVersement(archivesBordereau, true, 'consultation');
+            doc = GeneratePdfService.GenerateBordereauVersement(archivesBordereau, true, 'consultation');
         }
-        GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
+        GeneratePdfService.DownloadOnClick(doc, "pdfBordereauHolder", fileName);
     }
 
     const useStyles = makeStyles(theme => {
@@ -232,9 +248,11 @@ const DashboardUser = (props) => {
                          height: '80vh',
                          margin: '20px'
                      }}>
+
+                    // FIXME : Erreur au niveau de l'affichage, l'alerte se génère alors que le booléen est sur FALSE.
                     {errOccured && (
                         <Alert
-                            severity="danger"
+                            severity="warning"
                             style={{
                                 marginTop: "1rem"
                             }}>
@@ -243,7 +261,7 @@ const DashboardUser = (props) => {
                     )}
                     <AgGridReact
                         frameworkComponents={{
-                            actionRenderer: actionRenderer
+                            actionRenderer: ActionsRendererDashboardUser
                         }}
                         gridOptions={gridOption}
                         rowStyle={{textAlign: 'left'}}
@@ -251,10 +269,12 @@ const DashboardUser = (props) => {
                         defaultColDef={defaultColDef}
                         onGridReady={onGridReady}
                         columnDefs={columnDefs}
+                        context={{handleOpen, handleBordereau, handleEtiquette}}
                     >
                         <AgGridColumn field="cote" />
                         <AgGridColumn field="versement" />
                         <AgGridColumn field="status" />
+                        <AgGridColumn field="consultation.dateDemande" />
                         <AgGridColumn field="actions" />
                     </AgGridReact>
                 </div>
@@ -265,7 +285,7 @@ const DashboardUser = (props) => {
             </div>
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={() => handleClose(false)}
                 aria-labelledby="parent-modal-title"
                 aria-describedby="parent-modal-description"
             >
@@ -280,7 +300,29 @@ const DashboardUser = (props) => {
                         display: 'flex',
                         justifyContent: "space-evenly"
                     }}>
-                        <Button type={"button"} color={"secondary"} onClick={handleClose}>Non</Button>
+                        <Button type={"button"} color={"secondary"} onClick={() => handleClose(false)}>Non</Button>
+                        <Button type={"button"} variant="contained" color={"primary"} onClick={() => handleCancel(props.node)}>Oui</Button>
+                    </div>
+                </Box>
+            </Modal>
+            <Modal
+                open={openRetourPAL}
+                onClose={() => handleClose(true)}
+                aria-labelledby="parent-modal-title"
+                aria-describedby="parent-modal-description"
+            >
+                <Box style={style}>
+                    <h2 id="parent-modal-title">Demander le retour de l'archive au PAL ?</h2>
+                    <p id="parent-modal-description">
+                        Attention, vous allez demander le retour de l'archive au PAL. <br />
+                        Cette archive sera récupérée par la personne en charge des archives : <b>{line !== null ? line.cote : ''}.</b> <br />
+                        Voulez-vous continuer ?
+                    </p>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: "space-evenly"
+                    }}>
+                        <Button type={"button"} color={"secondary"} onClick={() => handleClose(true)}>Non</Button>
                         <Button type={"button"} variant="contained" color={"primary"} onClick={() => handleCancel(props.node)}>Oui</Button>
                     </div>
                 </Box>

@@ -9,9 +9,6 @@ import ActionsRendererDestroy from "../destroy-archive/actionsRendererDestroy";
 import LogoExcel from "../assets/images/excel_logo.png";
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
@@ -48,11 +45,11 @@ const DestroyArchive = (props) => {
     const [message, setMessage] = useState("Pas de données");
     const [open, setOpen] = useState(false);
     const [destructionCount, setDestructionCount] = useState();
-    const [value, setValue] = React.useState(0);
+    // const [value, setValue] = React.useState(0);
 
-    const handleChange = (event, newValue) => {
+    /*const handleChange = (event, newValue) => {
         setValue(newValue);
-    };
+    };*/
 
     let onGridReady = (params) => {
         setGridApi(params.api);
@@ -66,7 +63,6 @@ const DestroyArchive = (props) => {
         fetch(API_URL + "archives/" + reRenderParam)
             .then(result => result.json())
             .then(rowData => {
-                // GeneratePdfService.generateQrList(rowData, "QrHiddenHolder", true);
                 setRowData(rowData);
                 setDestructionCount(rowData.length);
             })
@@ -134,8 +130,8 @@ const DestroyArchive = (props) => {
     const columnDefs =
         [{field: "elimination",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},
         {field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
-        /*{field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
-        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},*/
+        {field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
         {field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
         {field: "direction",floatingFilterComponentParams: {suppressFilterButton: true,},},
         {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},sortable: true},
@@ -194,6 +190,8 @@ const DestroyArchive = (props) => {
                 >
                     <AgGridColumn field="destruction" />
                     <AgGridColumn field="cote" />
+                    <AgGridColumn field="nom" />
+                    <AgGridColumn field="prenom" />
                     <AgGridColumn field="compteVerseur" />
                     <AgGridColumn field="etablissement" />
                     <AgGridColumn field="direction" />

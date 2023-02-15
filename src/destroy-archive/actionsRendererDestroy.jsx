@@ -3,12 +3,11 @@ import {GoFlame, BiArchiveOut} from "react-icons/all";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import ArchiveService from '../_services/archive.service';
-import GeneratePdfService from "../_services/generatepdf.service";
 
 
 const actionsRendererDestroy =  (props) => {
-    let destroyActionAllowed = false;
-    let versementActionAllowed = true;
+/*    let destroyActionAllowed = false;
+    let versementActionAllowed = true;*/
 
     let archive = props.data;
     let statusCode = props.data.statusCode;
@@ -79,7 +78,7 @@ const actionsRendererDestroy =  (props) => {
         }
     }
 
-    const generateLabel = (several) => {
+    /*const generateLabel = (several) => {
         let archivesLabel = [];
         let fileName = `Etiquettes` + archive.cote;
         archivesLabel.push(archive);
@@ -97,9 +96,9 @@ const actionsRendererDestroy =  (props) => {
         }
         let doc = GeneratePdfService.generateEtiquettes(archivesLabel, true);
         GeneratePdfService.downloadOnClick(doc, "pdfLabelHolder", fileName);
-    }
+    }*/
 
-    const generateBordereau = (several) => {
+    /*const generateBordereau = (several) => {
         let archivesBordereau = [];
         let fileName = `Bordereau`;
         archivesBordereau.push(archive);
@@ -117,7 +116,7 @@ const actionsRendererDestroy =  (props) => {
         }
         let doc = GeneratePdfService.generateBordereauVersement(archivesBordereau, true);
         GeneratePdfService.downloadOnClick(doc, "pdfBordereauHolder", fileName);
-    }
+    }*/
 
     const renderSwitch = () => {
         if (statusCode !== 4) {

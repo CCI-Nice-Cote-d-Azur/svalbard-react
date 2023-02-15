@@ -12,19 +12,6 @@ import Alert from "@material-ui/lab/Alert";
 import {withRouter} from "react-router-dom";
 import {LinearProgress} from "@material-ui/core";
 
-/*function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}*/
-
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),

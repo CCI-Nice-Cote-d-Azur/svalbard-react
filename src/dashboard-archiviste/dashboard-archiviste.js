@@ -21,7 +21,7 @@ const DashboardArchiviste = (props) => {
         fetch(API_URL + "archives/allButArchived")
             .then(result => result.json())
             .then(rowData => {
-                GeneratePdfService.generateQrList(rowData, "QrHiddenHolder", true);
+                GeneratePdfService.GenerateQrList(rowData, "QrHiddenHolder", true);
                 setRowData(rowData);
             })
             .catch(() => {
@@ -82,9 +82,11 @@ const DashboardArchiviste = (props) => {
     }
 
     const columnDefs =
-        [{field: "versement",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},{field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
+        [{field: "versement",floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 110},
+        {field: 'cote',floatingFilterComponentParams: {suppressFilterButton: true,},maxWidth: 100},
         {field: 'nom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
-        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},{field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
+        {field: 'prenom',floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 100,maxWidth: 140},
+        {field: "etablissement",floatingFilterComponentParams: {suppressFilterButton: true,}},
         {field: "direction",floatingFilterComponentParams: {suppressFilterButton: true,},},
         {field: "service",floatingFilterComponentParams: {suppressFilterButton: true,},},
         {field: "status",floatingFilterComponentParams: {suppressFilterButton: true,},minWidth: 250},

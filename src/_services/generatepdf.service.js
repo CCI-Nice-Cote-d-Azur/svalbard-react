@@ -1,4 +1,4 @@
-import {Document, Image, Page, PDFDownloadLink, StyleSheet, Text, View} from "@react-pdf/renderer";
+import {Document, Image, Page, PDFDownloadLink, Text, View} from "@react-pdf/renderer";
 import React from "react";
 import {DataTableCell, Table, TableBody, TableCell, TableHeader} from "@david.kucsai/react-pdf-table";
 import ReactDOM from "react-dom";
@@ -6,91 +6,75 @@ import Typography from "@material-ui/core/Typography";
 import QRCode from "qrcode.react";
 import Button from "@material-ui/core/Button";
 import MiscService from "./misc.service";
+import {makeStyles} from "@material-ui/core/styles";
 
-const styles = StyleSheet.create({
-    accordionTitle: { fontSize: "1.2rem" },
-    bold: { fontWeight: 'bold' },
-    column: { width: '33%', display: 'flex', justifyContent: 'center' },
-    columnArchive: { display: 'flex',flexDirection: 'row', justifyContent: 'space-between'},
-    font_10: {fontSize: 10}, font_11: {fontSize: 11}, font_12: {fontSize: 12}, font_13: {fontSize: 13}, font_14: {fontSize: 14}, font_16: {fontSize: 16}, font_18: {fontSize: 18},
-    footer: { position: 'absolute', left: 0, right: 0, bottom: 15},
-    footerText: {textAlign: 'center'},
-    h2: { display: 'block', fontSize: 30, marginTop: 1, marginBottom: 1, marginLeft: 0, marginRight: 0, padding: 10 },
-    h2Center: { display: 'block', textAlign: 'center', fontSize: 30, marginTop: 1, marginBottom: 1, marginLeft: 0, marginRight: 0, padding: 10 },
-    mainBlock: { margin: 30 },
-    mb_20: {marginBottom: 20}, mb_30: {marginBottom: 30},
-    mt_20: {marginTop: 20},
-    nota: { marginLeft: 32},
-    qrImages: { margin: '8%', height: '200px', width: '200px' },
-    ref: {},
-    row: { flex: 1, flexDirection: 'row', flexGrow: 1 },
-    text: { margin: 10, fontFamily: 'Oswald', textAlign: 'justify'},
-    textInfo: { margin: '10%', display: 'flex', lineHeight: '1.3' },
-    title: { textAlign: 'center'},
-    titleBlock: {},
-    page: { padding: 10 },
-    w45: {width: '45%'}, w50: {width: '50%'},
-});
+const GenerateEtiquettes = (archivesArray, fromFront = false) => {
+    const useStyles = makeStyles((theme) => ({
+        column: { width: '33%', display: 'flex', justifyContent: 'center' },
+        h2Center: { display: 'block', textAlign: 'center', fontSize: 30, marginTop: 1, marginBottom: 1, marginLeft: 0, marginRight: 0, padding: 10 },
+        qrImages: { margin: '8%', height: '200px', width: '200px' },
+        textInfo: { margin: '10%', display: 'flex', lineHeight: '1.3' },
+    }));
 
-    const generateEtiquettes = (archivesArray, fromFront = false) => {
-        let renderPage = [];
-        let pageNumber = 0;
-        let renderItems = [];
-        // eslint-disable-next-line array-callback-return
-        archivesArray.map((value, index) => {
-            let cote = fromFront ? value['cote'] : value.Cote;
-            // let matriculeVerseur = fromFront ? value['matriculeVerseur'] : value.MatriculeVerseur;
-            let direction = fromFront ? value['direction'] : value.Direction;
-            let service = fromFront ? value['service'] : value.Service;
-            let versement = fromFront ? value['versement'] : value.Versement;
-            let dossiers = fromFront ? value['dossiers'] : value.Dossiers;
-            let elimination = fromFront ? value['elimination'] : value.Elimination;
-            const nom = fromFront
-                ? archivesArray[0].nom === undefined || archivesArray[0].nom === null ? '' : archivesArray[0].nom.toUpperCase()
-                : archivesArray[0].Nom === undefined || archivesArray[0].Nom === null ? '' : archivesArray[0].Nom.toUpperCase();
-            const prenom = fromFront
-                ? archivesArray[0].prenom !== undefined || archivesArray[0].prenom !== null ? '' : archivesArray[0].prenom
-                : archivesArray[0].Prenom !== undefined || archivesArray[0].Prenom !== null ? '' : archivesArray[0].Prenom;
+    const classes = useStyles();
+    let renderPage = [];
+    let pageNumber = 0;
+    let renderItems = [];
+    // eslint-disable-next-line array-callback-return
+    archivesArray.map((value, index) => {
+        let cote = fromFront ? value['cote'] : value.Cote;
+        // let matriculeVerseur = fromFront ? value['matriculeVerseur'] : value.MatriculeVerseur;
+        let direction = fromFront ? value['direction'] : value.Direction;
+        let service = fromFront ? value['service'] : value.Service;
+        let versement = fromFront ? value['versement'] : value.Versement;
+        let dossiers = fromFront ? value['dossiers'] : value.Dossiers;
+        let elimination = fromFront ? value['elimination'] : value.Elimination;
+        const nom = fromFront
+            ? archivesArray[0].nom === undefined || archivesArray[0].nom === null ? '' : archivesArray[0].nom.toUpperCase()
+            : archivesArray[0].Nom === undefined || archivesArray[0].Nom === null ? '' : archivesArray[0].Nom.toUpperCase();
+        const prenom = fromFront
+            ? archivesArray[0].prenom !== undefined || archivesArray[0].prenom !== null ? '' : archivesArray[0].prenom
+            : archivesArray[0].Prenom !== undefined || archivesArray[0].Prenom !== null ? '' : archivesArray[0].Prenom;
 
-            const canvas = document.getElementById(`$QRGenerated` + cote);
-            const pngUrl = canvas
-                .toDataURL("image/png")
-                .replace("image/png", "image/octet-stream");
-            if (index === 0 || index % 3 === 0) {
-                renderItems.push([]);
-                renderPage.push(
-                    <Page size='A4' orientation="landscape" wrap>
-                        <View style={[styles.row, { height: 575 }]}>{renderItems[pageNumber]}</View>
-                    </Page>
-                );
-            }
-            renderItems[pageNumber].push(
-                <View style={styles.column}>
-                    <Image src={pngUrl} style={styles.qrImages}/>
-                    <View style={styles.textInfo}>
-                        <Text style={styles.h2Center}>{cote}</Text>
-                        <Text>Versé par : {nom.toUpperCase() + ' ' + prenom }</Text>
-                        <Text>Direction : { direction }</Text>
-                        <Text>Service : { service }</Text>
-                        <Text>Versé le : {versement}</Text>
-                        {/*<Text>Etablissement : {value.Etablissement}</Text>
-                            <Text>Direction : {value.Direction}</Text>
-                            <Text>Service : {value.Service}</Text>*/}
-                        <Text>Contenu : {dossiers}</Text>
-                        <Text>Elimination en {elimination}</Text>
-                    </View>
-                </View>
+        const canvas = document.getElementById(`$QRGenerated` + cote);
+        const pngUrl = canvas
+            .toDataURL("image/png")
+            .replace("image/png", "image/octet-stream");
+        if (index === 0 || index % 3 === 0) {
+            renderItems.push([]);
+            renderPage.push(
+                <Page size='A4' orientation="landscape" wrap>
+                    <View style={[classes.row, { height: 575 }]}>{renderItems[pageNumber]}</View>
+                </Page>
             );
-            if(renderItems[pageNumber].length === 3) {
-                pageNumber += 1;
-            }
-        })
-        renderPage = <Document>{renderPage}</Document>
+        }
+        renderItems[pageNumber].push(
+            <View style={classes.column}>
+                <Image src={pngUrl} style={classes.qrImages}/>
+                <View style={classes.textInfo}>
+                    <Text style={classes.h2Center}>{cote}</Text>
+                    <Text>Versé par : {nom.toUpperCase() + ' ' + prenom }</Text>
+                    <Text>Direction : { direction }</Text>
+                    <Text>Service : { service }</Text>
+                    <Text>Versé le : {versement}</Text>
+                    {/*<Text>Etablissement : {value.Etablissement}</Text>
+                        <Text>Direction : {value.Direction}</Text>
+                        <Text>Service : {value.Service}</Text>*/}
+                    <Text>Contenu : {dossiers}</Text>
+                    <Text>Elimination en {elimination}</Text>
+                </View>
+            </View>
+        );
+        if(renderItems[pageNumber].length === 3) {
+            pageNumber += 1;
+        }
+    })
+    renderPage = <Document>{renderPage}</Document>
 
-        return renderPage;
-    }
+    return renderPage;
+}
 
-const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
+const DownloadOnClick = (doc, hostId, fileName, directDownload = true) => {
 
     ReactDOM.render(
         <div key={Math.random()}>
@@ -156,7 +140,12 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
      * @param id - Identifiant de la div qui va recevoir les QR codes
      * @param fromFront - Permet de savoir si on vient de l'interface Archiviste
      */
-    const generateQrList = (archivesArray, id, fromFront = false) => {
+    const GenerateQrList = (archivesArray, id, fromFront = false) => {
+        const useStyles = makeStyles((theme) => ({
+            accordionTitle: { fontSize: "1.2rem" },
+        }));
+
+        const classes = useStyles();
         ReactDOM.render(
             archivesArray.map((value, index) => {
                 const cote = fromFront ? value['cote'] : value.Cote;
@@ -168,7 +157,7 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                              flexDirection: "column",
                              width: "15vw"
                          }}>
-                        <Typography className={styles.accordionTitle}>{cote}</Typography>
+                        <Typography className={classes.accordionTitle}>{cote}</Typography>
                         <QRCode
                             value={JSON.stringify(value)}
                             size={200}
@@ -191,7 +180,33 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
      * @returns {[]}
      */
         // TODO : const generateBordereauVersement = (archivesArray, fromFront = false, type: string = 'versement-pal' ) => {
-    const generateBordereauVersement = (archivesArray, fromFront = false, type: string) => {
+    const GenerateBordereauVersement = (archivesArray, fromFront = false, type: string) => {
+            const useStyles = makeStyles((theme) => ({
+                accordionTitle: { fontSize: "1.2rem" },
+                bold: { fontWeight: 'bold' },
+                column: { width: '33%', display: 'flex', justifyContent: 'center' },
+                columnArchive: { display: 'flex',flexDirection: 'row', justifyContent: 'space-between'},
+                font_10: {fontSize: 10}, font_11: {fontSize: 11}, font_12: {fontSize: 12}, font_13: {fontSize: 13}, font_14: {fontSize: 14}, font_16: {fontSize: 16}, font_18: {fontSize: 18},
+                footer: { position: 'absolute', left: 0, right: 0, bottom: 15},
+                footerText: {textAlign: 'center'},
+                h2: { display: 'block', fontSize: 30, marginTop: 1, marginBottom: 1, marginLeft: 0, marginRight: 0, padding: 10 },
+                h2Center: { display: 'block', textAlign: 'center', fontSize: 30, marginTop: 1, marginBottom: 1, marginLeft: 0, marginRight: 0, padding: 10 },
+                mainBlock: { margin: 30 },
+                mb_20: {marginBottom: 20}, mb_30: {marginBottom: 30},
+                mt_20: {marginTop: 20},
+                nota: { marginLeft: 32},
+                qrImages: { margin: '8%', height: '200px', width: '200px' },
+                ref: {},
+                row: { flex: 1, flexDirection: 'row', flexGrow: 1 },
+                text: { margin: 10, fontFamily: 'Oswald', textAlign: 'justify'},
+                textInfo: { margin: '10%', display: 'flex', lineHeight: '1.3' },
+                title: { textAlign: 'center'},
+                titleBlock: {},
+                page: { padding: 10 },
+                w45: {width: '45%'}, w50: {width: '50%'},
+            }));
+
+            const classes = useStyles();
         /*// Routage selon si on vient d'un JSON ou du .NET
 
         const dossiers = !fromFront ? archivesArray[0].Dossiers : archivesArray[0].dossiers;
@@ -240,21 +255,21 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                 info2 = "La consultation pourra également se faire sur les bases informatiques à partir d'internet :";
                 info3 = "https://www.departement06.fr/archives-departementales/outils-de-recherche-et-archives-numerisees-2895.html";
                 liste_archive = (
-                    <View style={[styles.mb_20, styles.mt_20]}>
+                    <View style={[classes.mb_20, classes.mt_20]}>
                         <Table data={archivesArray}>
                             <TableHeader>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Numéro de boite</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Contenu</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : échantillonage, circuit, documentaire</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Numéro de boite</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Contenu</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : échantillonage, circuit, documentaire</TableCell>
                             </TableHeader>
                             <TableBody>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => r['cote'] || r['Cote']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => r['cote'] || r['Cote']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
                             </TableBody>
                         </Table>
                     </View>
@@ -265,21 +280,21 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                 ref = '';
                 let i = 0;
                 liste_archive = (
-                    <View style={[styles.mb_20, styles.mt_20]}>
+                    <View style={[classes.mb_20, classes.mt_20]}>
                         <Table data={archivesArray}>
                             <TableHeader>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Numéro d'article</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Catégories de documents</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : DUA, texte de référence, doubles...</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Numéro d'article</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Catégories de documents</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : DUA, texte de référence, doubles...</TableCell>
                             </TableHeader>
                             <TableBody>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={() => { i++; return i }}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['elimination'] || r['Elimination']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={() => { i++; return i }}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['elimination'] || r['Elimination']}/>
                             </TableBody>
                         </Table>
                     </View>
@@ -295,21 +310,21 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                 table_right_1_col1 = 'Date de la demande';
                 table_right_1_col2 = 'Nombre de pages du bordereau';
                 liste_archive = (
-                    <View style={[styles.mb_20, styles.mt_20, styles.bggray]}>
+                    <View style={[classes.mb_20, classes.mt_20, classes.bggray]}>
                         <Table data={archivesArray}>
                             <TableHeader>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Nombre de boîtes</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Catégories de documents</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : DUA, texte de référence, doubles...</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Nombre de boîtes</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Catégories de documents</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date début</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.1}>Date fin</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Observations : DUA, texte de référence, doubles...</TableCell>
                             </TableHeader>
                             <TableBody>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => r['cote'] || r['Cote']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['elimination'] || r['Elimination']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => r['cote'] || r['Cote']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['dossiers'] || r['Dossiers']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[0]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.1} getContent={(r) => {let extremes = r['extremes'] !== undefined ? r['extremes'] : r['Extremes']; return extremes.split('-')[1]}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r['elimination'] || r['Elimination']}/>
                             </TableBody>
                         </Table>
                     </View>
@@ -322,7 +337,7 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                 info1 = "Les documents indiqués ci-dessous ont été confiés à " + nom_utilisateur_confie + " et en est responsable à compter de ce jour."
 
                 ADS = (
-                    <View style={styles.w45}>
+                    <View style={classes.w45}>
                         <Table data={[
                             { col1: 'Administration', col2: consultation.etablissementDemandeur },
                             { col1: 'Direction', col2: consultation.directionDemandeur },
@@ -330,8 +345,8 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                         ]}>
                             <TableHeader />
                             <TableBody>
-                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
-                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
                             </TableBody>
                         </Table>
                     </View>
@@ -345,25 +360,25 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                         ]}>
                             <TableHeader />
                             <TableBody>
-                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r.col1}/>
-                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.7} getContent={(r) => r.col2}/>
+                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={(r) => r.col1}/>
+                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.7} getContent={(r) => r.col2}/>
                             </TableBody>
                         </Table>
                     </View>
                 )
                 liste_archive = (
-                    <View style={[styles.mb_20, styles.mt_20]}>
+                    <View style={[classes.mb_20, classes.mt_20]}>
                         <View style={{width: '60%'}}>
                         <Table data={archivesArray}>
                             <TableHeader>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Cote d'archivage</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Date de communication</TableCell>
-                                <TableCell style={[styles.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Date de retour</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.4}>Cote d'archivage</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Date de communication</TableCell>
+                                <TableCell style={[classes.font_11, {padding: 10, textAlign: 'center'}]} weighting={0.3}>Date de retour</TableCell>
                             </TableHeader>
                             <TableBody>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['cote'] || r['Cote']}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={() => {}}/>
-                                <DataTableCell style={[styles.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={() => {}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r['cote'] || r['Cote']}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={() => {}}/>
+                                <DataTableCell style={[classes.font_11, {padding: 10,}]} textAlign={'center'} weighting={0.3} getContent={() => {}}/>
                             </TableBody>
                         </Table>
                         </View>
@@ -396,18 +411,18 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
         renderPage.push(
             <Document>
                 <Page size='A4' orientation="landscape" wrap>
-                    <View style={styles.mainBlock}>
+                    <View style={classes.mainBlock}>
                         {/* Bloc Titre */}
-                        <View style={styles.titleBlock}>
-                            <Text style={[styles.title, styles.font_14, styles.mt_20]}>{title && title.toUpperCase()}</Text>
-                            <Text style={[styles.title, styles.font_12, styles.mt_20]}>{subtitle}</Text>
-                            <Text style={[styles.ref, styles.font_10, styles.mt_20]}>{ref}</Text>
+                        <View style={classes.titleBlock}>
+                            <Text style={[classes.title, classes.font_14, classes.mt_20]}>{title && title.toUpperCase()}</Text>
+                            <Text style={[classes.title, classes.font_12, classes.mt_20]}>{subtitle}</Text>
+                            <Text style={[classes.ref, classes.font_10, classes.mt_20]}>{ref}</Text>
                         </View>
                         {/* -- Bloc Titre FIN-- */}
-                        <View style={styles.mt_20}>
-                            <View style={styles.columnArchive}>
+                        <View style={classes.mt_20}>
+                            <View style={classes.columnArchive}>
                                 { type !== "consultation" ?
-                                <View style={styles.w45}>
+                                <View style={classes.w45}>
                                     <Table data={[
                                         {col1: 'Administration', col2: etablissement},
                                         {col1: 'Direction', col2: direction},
@@ -415,8 +430,8 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                                     ]}>
                                         <TableHeader />
                                         <TableBody>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
                                         </TableBody>
                                     </Table>
                                 </View>
@@ -429,11 +444,11 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                                             {col1: table_right_1_col2, col2: ''},
                                         ]}>
                                             <TableHeader>
-                                                {type !== 'elimination' && <TableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'}>Archives départementales (partie réservée)</TableCell> }
+                                                {type !== 'elimination' && <TableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'}>Archives départementales (partie réservée)</TableCell> }
                                             </TableHeader>
                                             <TableBody>
-                                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
-                                                <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                                <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
                                             </TableBody>
                                         </Table>
                                     </View>
@@ -441,8 +456,8 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                                 }
 
                             </View>
-                            <View style={[styles.mt_20, styles.columnArchive]}>
-                                <View style={styles.w45}>
+                            <View style={[classes.mt_20, classes.columnArchive]}>
+                                <View style={classes.w45}>
                                     <Table data={[
                                         {col1: 'Agent en charge du versement (nom, prénom)', col2: archivisteNomPrenom},
                                         {col1: 'Courriel', col2: archivisteMail},
@@ -450,19 +465,19 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                                     ]}>
                                         <TableHeader />
                                         <TableBody>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
                                         </TableBody>
                                     </Table>
                                 </View>
-                                <View style={styles.w50}>
+                                <View style={classes.w50}>
                                     <Table data={[
                                         {col1: 'Métrage linéaire', col2: archivesArray.length / 10},
                                     ]}>
                                         <TableHeader />
                                         <TableBody>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
-                                            <DataTableCell style={[styles.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} weighting={0.4} getContent={(r) => r.col1}/>
+                                            <DataTableCell style={[classes.font_12, {padding: 10,}]} textAlign={'center'} getContent={(r) => r.col2}/>
                                         </TableBody>
                                     </Table>
                                 </View>
@@ -470,53 +485,53 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
                         </View>
 
                         {/* -- Bloc Nota & Infos-- */}
-                        <View style={[styles.mb_30, styles.mt_20]}>
+                        <View style={[classes.mb_30, classes.mt_20]}>
                             <View>
-                                <Text style={[styles.font_10]}>{nota1}</Text>
-                                <Text style={[styles.nota, styles.font_10]}>{nota2}</Text>
-                                <Text style={[styles.nota, styles.font_10]}>{nota3}</Text>
+                                <Text style={[classes.font_10]}>{nota1}</Text>
+                                <Text style={[classes.nota, classes.font_10]}>{nota2}</Text>
+                                <Text style={[classes.nota, classes.font_10]}>{nota3}</Text>
                             </View>
-                            <View style={styles.mt_20}>
-                                <Text style={[styles.font_10, styles.title]}>{info1}</Text>
-                                <Text style={[styles.font_10, styles.title]}>{info2}</Text>
-                                <Text style={[styles.font_10, styles.title]}>{info3}</Text>
+                            <View style={classes.mt_20}>
+                                <Text style={[classes.font_10, classes.title]}>{info1}</Text>
+                                <Text style={[classes.font_10, classes.title]}>{info2}</Text>
+                                <Text style={[classes.font_10, classes.title]}>{info3}</Text>
                             </View>
                         </View>
                         {/* -- Bloc Nota & Infos FIN-- */}
                     </View>
                     {type === "versement-ad" &&
-                        <View fixed={true} style={styles.footer}>
-                            <Text style={[styles.footerText, styles.font_10]}>{footer}</Text>
+                        <View fixed={true} style={classes.footer}>
+                            <Text style={[classes.footerText, classes.font_10]}>{footer}</Text>
                         </View>
                     }
                 </Page>
                 <Page size='A4' orientation="landscape" wrap>
-                    <View style={styles.mainBlock}>
+                    <View style={classes.mainBlock}>
                         {/* Bloc Liste des archives */}
 
                             { liste_archive }
 
                         {/* Bloc Liste des archives FIN */}
                         {/* -- Bloc Responsable service & Responsable archive départementale -- */}
-                        <View style={[styles.columnArchive ,styles.mt_20, styles.mb_20]}>
-                            <View style={[styles.w50 ,styles.mt_20]}>
-                                <Text style={styles.font_10}>{responsableService1}</Text>
-                                <Text style={[styles.mt_20, styles.font_10]}>{responsableService2} {nom + ' ' + prenom }</Text>
-                                <Text style={[styles.mt_20, styles.font_10]}>{responsableService3} {versement}</Text>
-                                <Text style={styles.font_10}>{responsableService4}</Text>
+                        <View style={[classes.columnArchive ,classes.mt_20, classes.mb_20]}>
+                            <View style={[classes.w50 ,classes.mt_20]}>
+                                <Text style={classes.font_10}>{responsableService1}</Text>
+                                <Text style={[classes.mt_20, classes.font_10]}>{responsableService2} {nom + ' ' + prenom }</Text>
+                                <Text style={[classes.mt_20, classes.font_10]}>{responsableService3} {versement}</Text>
+                                <Text style={classes.font_10}>{responsableService4}</Text>
                             </View>
-                            <View style={[styles.w50 ,styles.mt_20]}>
-                                <Text style={styles.font_10}>{responsableArchive1}</Text>
-                                <Text style={[styles.mt_20, styles.font_10]}>{responsableArchive2}</Text>
-                                <Text style={[styles.mt_20, styles.font_10]}>{responsableArchive3}</Text>
-                                <Text style={styles.font_10}>{responsableArchive4}</Text>
+                            <View style={[classes.w50 ,classes.mt_20]}>
+                                <Text style={classes.font_10}>{responsableArchive1}</Text>
+                                <Text style={[classes.mt_20, classes.font_10]}>{responsableArchive2}</Text>
+                                <Text style={[classes.mt_20, classes.font_10]}>{responsableArchive3}</Text>
+                                <Text style={classes.font_10}>{responsableArchive4}</Text>
                             </View>
                         </View>
                         {/* -- Bloc Responsable service & Responsable archive départementale FIN-- */}
                     </View>
                     { type === "versement-ad" &&
-                        <View fixed={true} style={styles.footer}>
-                          <Text style={[styles.footerText, styles.font_10]}>{footer}</Text>
+                        <View fixed={true} style={classes.footer}>
+                          <Text style={[classes.footerText, classes.font_10]}>{footer}</Text>
                         </View>
                     }
                 </Page>
@@ -527,10 +542,10 @@ const downloadOnClick = (doc, hostId, fileName, directDownload = true) => {
     }
 
 const GeneratePdfService = {
-    generateEtiquettes,
-    generateBordereauVersement,
-    generateQrList,
-    downloadOnClick
+    GenerateEtiquettes,
+    GenerateBordereauVersement,
+    GenerateQrList,
+    DownloadOnClick
 }
 
 export default GeneratePdfService;

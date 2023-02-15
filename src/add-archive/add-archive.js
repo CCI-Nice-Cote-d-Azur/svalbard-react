@@ -100,12 +100,69 @@ function getSteps() {
 }
 
 const AddArchive = (props) => {
+    const useStyles = makeStyles((theme) => ({
+        root: {
+            width: '100%',
+        },
+        button: {
+            marginTop: theme.spacing(1),
+            marginRight: theme.spacing(1),
+        },
+        actionsContainer: {
+            marginBottom: theme.spacing(2),
+        },
+        resetContainer: {
+            padding: theme.spacing(3),
+            display: "flex",
+            justifyContent: "space-around"
+        },
+        fab: {
+            marginLeft: theme.spacing(4),
+        },
+        tooltip: {
+            maxWidth: "45vw",
+            minWidth: "45vw",
+            maxHeight: "50vh",
+        },
+        accordionTitle: {
+            fontSize: "1.2rem"
+        },
+        accordion: {
+            marginTop: theme.spacing(3),
+        },
+        box: {
+            marginBottom: theme.spacing(3)
+        },
+        accordionDetails: {
+            display: "flex",
+            flexDirection: "column",
+        },
+        accordionTypoDetails: {
+            marginBottom: theme.spacing(3),
+            textDecoration: "underline"
+        },
+        accordionTypoTips: {
+            marginBottom: theme.spacing(3),
+        },
+        page: {
+            display: "flex",
+            flexDirection: "row",
+            backgroundColor: '#E4E4E4'
+        },
+        section: {
+            margin: 10,
+            padding: 10,
+            flexGrow: 1,
+            width: "33%",
+            backgroundColor: "red"
+        },
+    }));
+
     const classes = useStyles();
     const API_URL = process.env.REACT_APP_API_URL;
     const { apiRef, columns } = useApiRef();
 
     const [activeStep, setActiveStep] = React.useState(0);
-    const [lastCoteObj, setLastCoteObj] = React.useState('');
     const [lastCote, setLastCote] = React.useState('');
     const [inputValue, setInputValue] = React.useState('');
     const [cotesList, setCotesList] = React.useState([]);
@@ -140,11 +197,6 @@ const AddArchive = (props) => {
         }
         rows = tempArr;
     }
-
-    /*const onQRGenerate = (archivesArray) => {
-        const doc = GeneratePdfService.generateEtiquettes(archivesArray);
-        GeneratePdfService.downloadOnClick(doc, "pdfLinkHolder", "Etiquettes")
-    }*/
 
     const steps = getSteps();
 
@@ -200,12 +252,12 @@ const AddArchive = (props) => {
             setQrGenerated(true);
         });
         handleNext();
-        GeneratePdfService.generateQrList(archivesArray, "QrList");
+        GeneratePdfService.GenerateQrList(archivesArray, "QrList");
 
-        let doc = GeneratePdfService.generateEtiquettes(archivesArray);
-        GeneratePdfService.downloadOnClick(doc, "etiquetteBtnHolder", "etiquette(s)", false);
-        doc = GeneratePdfService.generateBordereauVersement(archivesArray)
-        GeneratePdfService.downloadOnClick(doc, "bordereauBtnHolder", "bordereau", false);
+        let doc = GeneratePdfService.GenerateEtiquettes(archivesArray);
+        GeneratePdfService.DownloadOnClick(doc, "etiquetteBtnHolder", "etiquette(s)", false);
+        doc = GeneratePdfService.GenerateBordereauVersement(archivesArray)
+        GeneratePdfService.DownloadOnClick(doc, "bordereauBtnHolder", "bordereau", false);
         /*onQRGenerate(archivesArray);*/
         // archivesArray = [];
     }
@@ -458,64 +510,6 @@ const AddArchive = (props) => {
         </div>
     );
 }
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
-    },
-    button: {
-        marginTop: theme.spacing(1),
-        marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-        marginBottom: theme.spacing(2),
-    },
-    resetContainer: {
-        padding: theme.spacing(3),
-        display: "flex",
-        justifyContent: "space-around"
-    },
-    fab: {
-        marginLeft: theme.spacing(4),
-    },
-    tooltip: {
-        maxWidth: "45vw",
-        minWidth: "45vw",
-        maxHeight: "50vh",
-    },
-    accordionTitle: {
-        fontSize: "1.2rem"
-    },
-    accordion: {
-        marginTop: theme.spacing(3),
-    },
-    box: {
-        marginBottom: theme.spacing(3)
-    },
-    accordionDetails: {
-        display: "flex",
-        flexDirection: "column",
-    },
-    accordionTypoDetails: {
-        marginBottom: theme.spacing(3),
-        textDecoration: "underline"
-    },
-    accordionTypoTips: {
-        marginBottom: theme.spacing(3),
-    },
-    page: {
-        display: "flex",
-        flexDirection: "row",
-        backgroundColor: '#E4E4E4'
-    },
-    section: {
-        margin: 10,
-        padding: 10,
-        flexGrow: 1,
-        width: "33%",
-        backgroundColor: "red"
-    },
-}));
 
 export default AddArchive;
 

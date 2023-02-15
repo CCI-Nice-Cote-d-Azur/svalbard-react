@@ -110,8 +110,10 @@ const Archives = (props) => {
                 matriculeDemandeur: registeredUser.matricule,
                 etablissementDemandeur: registeredUser.site,
                 directionDemandeur: registeredUser.direction,
-                serviceDemandeur: registeredUser.service
+                serviceDemandeur: registeredUser.service,
+                dateDemande: new Date(Date.now())
             }
+            console.log(row);
         });
 
         ArchiveService.putUpdateManyStatuses(selectedRows)
